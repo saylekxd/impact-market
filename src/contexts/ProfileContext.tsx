@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabase';
 import { toast } from 'react-hot-toast';
@@ -68,13 +68,10 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, loadProfile]);
 
+  const value = useMemo(() => ({ profile, loading, loadProfile, updateProfile }), [profile, loading, loadProfile, updateProfile]);
+
   return (
-    <ProfileContext.Provider value={{
-      profile,
-      loading,
-      loadProfile,
-      updateProfile,
-    }}>
+    <ProfileContext.Provider value={value}>
       {children}
     </ProfileContext.Provider>
   );
