@@ -1,1 +1,1 @@
-# zjedzciastko
+# zjedzciastko.pl
