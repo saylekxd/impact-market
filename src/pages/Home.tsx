@@ -1,6 +1,4 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Rocket, Users, Shield, Mail } from 'lucide-react';
 import PageLayout from '../components/PageLayout';
 
 export default function Home() {
@@ -13,11 +11,10 @@ export default function Home() {
           
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl transform transition-all duration-300 hover:shadow-[#FF9F2D]/10">
             <h2 className="text-2xl md:text-3xl font-semibold text-white mb-4">
-              Nowa era handlu społecznościowego
+            Nowa era dobroczynności cyfrowej
             </h2>
             <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
-              Łączymy twórców i ich społeczności w unikalnym marketplace, 
-              gdzie każda transakcja buduje silniejsze więzi.
+            Tworzymy innowacyjny marketplace, gdzie każda transakcja zamienia się w realną pomoc. Kupując wirtualne dobra, wspierasz ludzi i organizacje, które zmieniają świat na lepsze.
             </p>
             
             {/* Progress Bar */}
@@ -61,12 +58,32 @@ export default function Home() {
         {/* Footer */}
         <footer className="mt-20 text-center text-gray-400">
           <div className="flex justify-center space-x-6 mb-4">
-            <a href="#" className="hover:text-[#FF9F2D] transition-colors duration-200">O nas</a>
-            <a href="#" className="hover:text-[#FF9F2D] transition-colors duration-200">Blog</a>
-            <a href="#" className="hover:text-[#FF9F2D] transition-colors duration-200">Polityka prywatności</a>
-            <a href="#" className="hover:text-[#FF9F2D] transition-colors duration-200">Regulamin</a>
+            <Link to="/about" className="hover:text-[#FF9F2D] transition-colors duration-200">O nas</Link>
+            <Link to="/privacy" className="hover:text-[#FF9F2D] transition-colors duration-200">Polityka prywatności</Link>
+            <Link to="/terms" className="hover:text-[#FF9F2D] transition-colors duration-200">Regulamin</Link>
           </div>
+
           <p>© {new Date().getFullYear()} Impact Market. Wszystkie prawa zastrzeżone.</p>
+          
+          {/* Added developer info */}
+          <div className="flex items-center justify-center gap-2 mt-4">
+            <span className="text-[0.9rem] h-[1.5rem] flex items-center">Developed by</span>
+            <a 
+              href="https://swtlabs.pl" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:scale-105 transition-transform duration-200"
+            >
+              <img 
+                src="/swtlabs-logo.png" 
+                alt="SWTLabs Logo" 
+                className="max-w-[2rem] sm:max-w-[3rem] md:max-w-[4rem] w-auto h-auto transition-all"
+                style={{ aspectRatio: '140/45' }} // Actual logo aspect ratio (replace with your logo's ratio)
+              />
+            </a>
+          </div>
+
+      
         </footer>
       </div>
     </PageLayout>

@@ -1,7 +1,7 @@
-import React from 'react';
+
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LogIn, LogOut, User, ShoppingCart } from 'lucide-react';
+import { LogIn, LogOut, User, } from 'lucide-react';
 import { auth } from '../lib/auth';
 import { toast } from 'react-hot-toast';
 
@@ -22,12 +22,13 @@ export default function Navbar() {
           <div className="flex items-center">
             <Link 
               to="/" 
-              className="flex items-center space-x-2 text-white hover:text-[#FF9F2D] transition-colors duration-200"
+              className="flex items-center"
             >
-              <ShoppingCart className="w-8 h-8 text-[#FF9F2D]" />
-              <span className="font-bold text-xl">
-                Impact<span className="text-[#FF9F2D]">market.pl</span>
-              </span>
+              <img 
+                src="/impactmarket-logo.svg"  // or use an external URL like "https://images.unsplash.com/photo-1611162618071-b39a2ec055c3"
+                alt="Impactmarket.pl logo"
+                className="h-12 w-auto object-contain" 
+              />
             </Link>
           </div>
           
