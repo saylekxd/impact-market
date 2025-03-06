@@ -34,6 +34,7 @@ Polska platforma crowdfundingowa łącząca technologię z działaniami charytat
 - React Router 6
 - React Hot Toast
 - Lucide React Icons
+- **Ikony**: [Flaticon](https://www.flaticon.com/) (wybrane elementy graficzne)
 
 **Backend**:
 - Supabase (Auth + Database)
@@ -57,3 +58,7 @@ biuro@slowemwtwarz.pl
 
 Developed with ❤️ by [SWTLabs](https://swtlabs.pl)  
 ![SWTLabs Logo](public/swtlabs-logo.png)
+
+<div class="flaticon-attribution" style="margin-top: 20px; font-size: 0.8em; color: #666;">
+    Icons by [Author Name] from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+</div>
