@@ -21,18 +21,12 @@ export const auth = {
    */
   async login({ email, password }: LoginCredentials): Promise<AuthResult> {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
-      
-      // Store the session in localStorage
-      if (data.session) {
-        localStorage.setItem('supabase.auth.token', data.session.access_token);
-        localStorage.setItem('supabase.auth.refreshToken', data.session.refresh_token);
-      }
 
       return { success: true };
     } catch (error) {
@@ -72,11 +66,6 @@ export const auth = {
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: {
-            username: username.toLowerCase(),
-          },
-        },
       });
 
       if (signUpError) {
@@ -118,37 +107,9 @@ export const auth = {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      
-      // Clear stored tokens
-      localStorage.removeItem('supabase.auth.token');
-      localStorage.removeItem('supabase.auth.refreshToken');
-      
       return { success: true };
     } catch (error) {
       return { success: false, error: 'Wystąpił błąd podczas wylogowywania' };
-    }
-  },
-
-  /**
-   * Odśwież token
-   */
-  async refreshSession(): Promise<AuthResult> {
-    try {
-      const { data, error } = await supabase.auth.refreshSession();
-      
-      if (error) throw error;
-      
-      if (data.session) {
-        localStorage.setItem('supabase.auth.token', data.session.access_token);
-        localStorage.setItem('supabase.auth.refreshToken', data.session.refresh_token);
-      }
-      
-      return { success: true };
-    } catch (error) {
-      return { 
-        success: false, 
-        error: 'Nie udało się odświeżyć sesji'
-      };
     }
   },
 };

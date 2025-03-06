@@ -1,29 +1,36 @@
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import AppRoutes from './AppRoutes.tsx';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import CreatorProfile from './pages/CreatorProfile';
+import Dashboard from './pages/Dashboard';
+import PaymentTest from './pages/PaymentTest';
+import PaymentSuccess from './pages/PaymentSuccess';
 import { AuthProvider } from './contexts/AuthContext';
-import { ProfileProvider } from './contexts/ProfileContext';
-import { PaymentsProvider } from './contexts/PaymentsContext';
-import { PayoutProvider } from './contexts/PayoutContext';
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <ProfileProvider>
-          <PaymentsProvider>
-            <PayoutProvider>
-              <div className="min-h-screen bg-gray-50">
-                <AppRoutes />
-                <Toaster position="top-center" />
-              </div>
-            </PayoutProvider>
-          </PaymentsProvider>
-        </ProfileProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="min-h-screen bg-gray-50">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/:username" element={<CreatorProfile />} />
+            <Route path="/payment/test" element={<PaymentTest />} />
+            <Route path="/payment/success" element={<PaymentSuccess />} />
+          </Routes>
+          <Toaster position="top-center" />
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
-export default App;
+export default App

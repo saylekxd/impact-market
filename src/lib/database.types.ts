@@ -10,8 +10,6 @@ export interface Database {
           avatar_url: string | null;
           created_at: string;
           updated_at: string;
-          available_balance: number;
-          total_donations: number;
         };
         Insert: {
           id: string;
@@ -21,8 +19,6 @@ export interface Database {
           avatar_url?: string | null;
           created_at?: string;
           updated_at?: string;
-          available_balance?: number;
-          total_donations?: number;
         };
         Update: {
           id?: string;
@@ -32,8 +28,6 @@ export interface Database {
           avatar_url?: string | null;
           created_at?: string;
           updated_at?: string;
-          available_balance?: number;
-          total_donations?: number;
         };
       };
       payments: {
@@ -69,67 +63,6 @@ export interface Database {
           payer_name?: string | null;
           payer_email?: string | null;
           created_at?: string;
-        };
-      };
-      bank_accounts: {
-        Row: {
-          id: string;
-          user_id: string;
-          account_number: string;
-          bank_name: string;
-          swift_code: string;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          account_number: string;
-          bank_name: string;
-          swift_code: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          account_number?: string;
-          bank_name?: string;
-          swift_code?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-      };
-      payouts: {
-        Row: {
-          id: string;
-          user_id: string;
-          amount: number;
-          status: string;
-          bank_account_id: string;
-          created_at: string;
-          processed_at: string | null;
-          admin_id: string | null;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          amount: number;
-          status?: string;
-          bank_account_id: string;
-          created_at?: string;
-          processed_at?: string | null;
-          admin_id?: string | null;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          amount?: number;
-          status?: string;
-          bank_account_id?: string;
-          created_at?: string;
-          processed_at?: string | null;
-          admin_id?: string | null;
         };
       };
     };

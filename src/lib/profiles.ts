@@ -25,10 +25,8 @@ export const profiles = {
       if (error) throw error;
       if (!data) throw new Error('Nie znaleziono profilu');
 
-      console.log('Profile data by username:', data); // Debug log
       return { success: true, data };
     } catch (error: any) {
-      console.error('Error getting profile by username:', error); // Debug log
       return {
         success: false,
         error: error.message === 'Nie znaleziono profilu'
@@ -52,10 +50,8 @@ export const profiles = {
       if (error) throw error;
       if (!data) throw new Error('Nie znaleziono profilu');
 
-      console.log('Profile data by ID:', data); // Debug log
       return { success: true, data };
     } catch (error: any) {
-      console.error('Error getting profile by ID:', error); // Debug log
       return {
         success: false,
         error: error.message === 'Nie znaleziono profilu'
@@ -80,10 +76,8 @@ export const profiles = {
       if (error) throw error;
       if (!data) throw new Error('Nie znaleziono profilu');
 
-      console.log('Updated profile data:', data); // Debug log
       return { success: true, data };
     } catch (error: any) {
-      console.error('Error updating profile:', error); // Debug log
       return {
         success: false,
         error: 'Wystąpił błąd podczas aktualizacji profilu',

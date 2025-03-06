@@ -1,76 +1,74 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Gift, Shield } from 'lucide-react';
+import { ShoppingCart, Rocket, Users, Shield, Mail } from 'lucide-react';
+import PageLayout from '../components/PageLayout';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
-            Wspieraj twórców <span className="text-blue-600">jednym kliknięciem</span>
-          </h1>
-          <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-            Platforma umożliwiająca łatwe wspieranie ulubionych twórców poprzez bezpieczne płatności online.
-          </p>
-          <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-            <div className="rounded-md shadow">
-              <Link
-                to="/register"
-                className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
+    <PageLayout>
+      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          
+          
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl transform transition-all duration-300 hover:shadow-[#FF9F2D]/10">
+            <h2 className="text-2xl md:text-3xl font-semibold text-white mb-4">
+              Nowa era handlu społecznościowego
+            </h2>
+            <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
+              Łączymy twórców i ich społeczności w unikalnym marketplace, 
+              gdzie każda transakcja buduje silniejsze więzi.
+            </p>
+            
+            {/* Progress Bar */}
+            <div className="max-w-md mx-auto mb-6">
+              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-[#FF9F2D] rounded-full w-3/4 animate-pulse"></div>
+              </div>
+              <p className="text-gray-400 text-sm mt-2">
+                Postęp prac: 75%
+              </p>
+            </div>
+
+       
+            
+            <p className="text-gray-300 mb-6">
+              Zapisz się do newslettera, aby otrzymywać informacje o postępach prac i dacie startu platformy.
+            </p>
+            <form className="flex flex-col sm:flex-row gap-4 justify-center">
+              <input
+                type="email"
+                placeholder="Twój adres email"
+                className="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF9F2D] focus:border-transparent"
+              />
+              <button
+                type="submit"
+                className="px-6 py-2 rounded-full bg-[#FF9F2D] text-white font-medium hover:bg-[#f39729] transition-all duration-200 transform hover:scale-105"
               >
-                Rozpocznij jako twórca
-              </Link>
-            </div>
+                Zapisz się
+              </button>
+            </form>
+        
+           
           </div>
         </div>
 
-        <div className="mt-24">
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="pt-6">
-              <div className="flow-root bg-white rounded-lg px-6 pb-8">
-                <div className="-mt-6">
-                  <div className="inline-flex items-center justify-center p-3 bg-blue-500 rounded-md shadow-lg">
-                    <Heart className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">Proste wsparcie</h3>
-                  <p className="mt-5 text-base text-gray-500">
-                    Wspieraj twórców bez konieczności rejestracji. Wystarczy karta lub BLIK.
-                  </p>
-                </div>
-              </div>
-            </div>
+       
+    
 
-            <div className="pt-6">
-              <div className="flow-root bg-white rounded-lg px-6 pb-8">
-                <div className="-mt-6">
-                  <div className="inline-flex items-center justify-center p-3 bg-blue-500 rounded-md shadow-lg">
-                    <Gift className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">Personalizowane wpłaty</h3>
-                  <p className="mt-5 text-base text-gray-500">
-                    Dodaj osobistą wiadomość do swojej wpłaty i pokaż swoje wsparcie.
-                  </p>
-                </div>
-              </div>
-            </div>
+    
 
-            <div className="pt-6">
-              <div className="flow-root bg-white rounded-lg px-6 pb-8">
-                <div className="-mt-6">
-                  <div className="inline-flex items-center justify-center p-3 bg-blue-500 rounded-md shadow-lg">
-                    <Shield className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="mt-8 text-lg font-medium text-gray-900 tracking-tight">Bezpieczne płatności</h3>
-                  <p className="mt-5 text-base text-gray-500">
-                    Wszystkie transakcje są chronione i przetwarzane przez zaufanych operatorów płatności.
-                  </p>
-                </div>
-              </div>
-            </div>
+        {/* Footer */}
+        <footer className="mt-20 text-center text-gray-400">
+          <div className="flex justify-center space-x-6 mb-4">
+            <a href="#" className="hover:text-[#FF9F2D] transition-colors duration-200">O nas</a>
+            <a href="#" className="hover:text-[#FF9F2D] transition-colors duration-200">Blog</a>
+            <a href="#" className="hover:text-[#FF9F2D] transition-colors duration-200">Polityka prywatności</a>
+            <a href="#" className="hover:text-[#FF9F2D] transition-colors duration-200">Regulamin</a>
           </div>
-        </div>
+          <p>© {new Date().getFullYear()} Impact Market. Wszystkie prawa zastrzeżone.</p>
+        </footer>
       </div>
-    </div>
+    </PageLayout>
   );
 }
