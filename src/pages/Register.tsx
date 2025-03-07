@@ -1,28 +1,85 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Construction, Mail, Lock, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, Lock, User } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 import PageLayout from '../components/PageLayout';
 
 export default function Register() {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      // First check if the username is available
+      const { data: isAvailable, error: checkError } = await supabase.rpc(
+        'check_username_available',
+        { username: username.toLowerCase() }
+      );
+
+      if (checkError) throw checkError;
+
+      if (!isAvailable) {
+        throw new Error('Ta nazwa użytkownika jest już zajęta');
+      }
+
+      // Sign up the user
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (signUpError) throw signUpError;
+      if (!data.user) throw new Error('Nie udało się utworzyć konta');
+
+      // Create a profile for the user
+      const { error: profileError } = await supabase.from('profiles').insert({
+        id: data.user.id,
+        username: username.toLowerCase(),
+        display_name: username,
+      });
+
+      if (profileError) throw profileError;
+
+      navigate('/dashboard');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Wystąpił błąd podczas rejestracji');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <PageLayout>
       <div className="max-w-md w-full">
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl transform transition-all duration-300 hover:shadow-[#FF9F2D]/10 hover:scale-[1.01]">
           <div className="text-center">
-            <div className="flex justify-center">
-              <Construction className="h-16 w-16 text-[#FF9F2D] animate-bounce" />
-            </div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
-              Strona w budowie
+              Zarejestruj się
             </h2>
             <p className="mt-2 text-center text-sm text-gray-300">
-              Rejestracja będzie dostępna wkrótce!
+              Lub{' '}
+              <Link to="/login" className="font-medium text-[#FF9F2D] hover:text-[#f39729]">
+                zaloguj się
+              </Link>
             </p>
           </div>
 
-          {/* Disabled form for visual representation */}
-          <form className="mt-8 space-y-6">
-            <div className="rounded-md shadow-sm -space-y-px opacity-50">
+          <form onSubmit={handleRegister} className="mt-8 space-y-6">
+            {error && (
+              <div className="text-red-500 text-sm text-center bg-red-500/10 p-2 rounded">
+                {error}
+              </div>
+            )}
+            
+            <div className="rounded-md shadow-sm -space-y-px">
               <div>
                 <label htmlFor="username" className="sr-only">
                   Nazwa użytkownika
@@ -35,8 +92,10 @@ export default function Register() {
                     id="username"
                     name="username"
                     type="text"
-                    disabled
-                    className="appearance-none rounded-t-md relative block w-full px-3 py-2 pl-10 border border-gray-300/50 bg-white/5 placeholder-gray-400 text-white focus:outline-none focus:ring-[#FF9F2D] focus:border-[#FF9F2D] focus:z-10 sm:text-sm cursor-not-allowed"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                    className="appearance-none rounded-t-md relative block w-full px-3 py-2 pl-10 border border-gray-300/50 bg-white/5 placeholder-gray-400 text-white focus:outline-none focus:ring-[#FF9F2D] focus:border-[#FF9F2D] focus:z-10 sm:text-sm"
                     placeholder="Nazwa użytkownika"
                   />
                 </div>
@@ -53,8 +112,10 @@ export default function Register() {
                     id="email"
                     name="email"
                     type="email"
-                    disabled
-                    className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300/50 bg-white/5 placeholder-gray-400 text-white focus:outline-none focus:ring-[#FF9F2D] focus:border-[#FF9F2D] focus:z-10 sm:text-sm cursor-not-allowed"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300/50 bg-white/5 placeholder-gray-400 text-white focus:outline-none focus:ring-[#FF9F2D] focus:border-[#FF9F2D] focus:z-10 sm:text-sm"
                     placeholder="Adres email"
                   />
                 </div>
@@ -71,8 +132,10 @@ export default function Register() {
                     id="password"
                     name="password"
                     type="password"
-                    disabled
-                    className="appearance-none rounded-b-md relative block w-full px-3 py-2 pl-10 border border-gray-300/50 bg-white/5 placeholder-gray-400 text-white focus:outline-none focus:ring-[#FF9F2D] focus:border-[#FF9F2D] focus:z-10 sm:text-sm cursor-not-allowed"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="appearance-none rounded-b-md relative block w-full px-3 py-2 pl-10 border border-gray-300/50 bg-white/5 placeholder-gray-400 text-white focus:outline-none focus:ring-[#FF9F2D] focus:border-[#FF9F2D] focus:z-10 sm:text-sm"
                     placeholder="Hasło"
                   />
                 </div>
@@ -81,34 +144,26 @@ export default function Register() {
 
             <div>
               <button
-                type="button"
-                disabled
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#FF9F2D]/50 cursor-not-allowed"
+                type="submit"
+                disabled={loading}
+                className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
+                  loading 
+                    ? 'bg-[#FF9F2D]/50 cursor-not-allowed' 
+                    : 'bg-[#FF9F2D] hover:bg-[#f39729] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF9F2D]'
+                }`}
               >
-                Rejestracja tymczasowo niedostępna
+                {loading ? 'Rejestracja...' : 'Zarejestruj się'}
               </button>
             </div>
           </form>
 
-          <div className="mt-8 text-center">
+          <div className="mt-4 text-center">
             <Link 
               to="/" 
               className="font-medium text-[#FF9F2D] hover:text-[#f39729] transition-colors duration-200"
             >
               Wróć do strony głównej
             </Link>
-          </div>
-
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-300">
-              Chcesz wiedzieć kiedy uruchomimy rejestrację?
-            </p>
-            <a 
-              href="mailto:kontakt@impactmarket.pl" 
-              className="mt-2 inline-block text-sm text-[#FF9F2D] hover:text-[#f39729] transition-colors duration-200"
-            >
-              Napisz do nas!
-            </a>
           </div>
         </div>
       </div>

@@ -7,6 +7,7 @@ import { donations } from '../lib/donations';
 import type { Profile } from '../lib/profiles';
 import type { Payment } from '../lib/donations';
 import { TrendingUp, Users, CreditCard, Calendar, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import DashboardLayout from '../components/DashboardLayout';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -36,35 +37,38 @@ export default function Dashboard() {
     async function loadData() {
       try {
         // Load profile
-        const profileResult = await profiles.getById(user.id);
+        const profileResult = await profiles.getById(user?.id || '');
         if (!profileResult.success) {
           throw new Error(profileResult.error);
         }
         
-        setProfile(profileResult.data);
-        setFormData({
-          display_name: profileResult.data.display_name || '',
-          bio: profileResult.data.bio || '',
-          avatar_url: profileResult.data.avatar_url || '',
-        });
+        if (profileResult.data) {
+          setProfile(profileResult.data);
+          setFormData({
+            display_name: profileResult.data?.display_name || '',
+            bio: profileResult.data?.bio || '',
+            avatar_url: profileResult.data?.avatar_url || '',
+          });
+        }
 
         // Load payments
-        const paymentsResult = await donations.getByCreatorId(user.id);
+        const paymentsResult = await donations.getByCreatorId(user?.id || '');
         if (!paymentsResult.success) {
           throw new Error(paymentsResult.error);
         }
         
-        setPayments(paymentsResult.data || []);
+        const paymentData = paymentsResult.data || [];
+        setPayments(paymentData);
 
         // Calculate statistics
         const now = new Date();
         const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
         const twoMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, 1);
 
-        const totalAmount = paymentsResult.data.reduce((sum, p) => sum + p.amount, 0);
-        const uniqueDonors = new Set(paymentsResult.data.map(p => p.payer_email || p.payer_name)).size;
-        const lastMonthPayments = paymentsResult.data.filter(p => new Date(p.created_at) >= lastMonth);
-        const previousMonthPayments = paymentsResult.data.filter(p => 
+        const totalAmount = paymentData.reduce((sum, p) => sum + p.amount, 0);
+        const uniqueDonors = new Set(paymentData.map(p => p.payer_email || p.payer_name)).size;
+        const lastMonthPayments = paymentData.filter(p => new Date(p.created_at) >= lastMonth);
+        const previousMonthPayments = paymentData.filter(p => 
           new Date(p.created_at) >= twoMonthsAgo && new Date(p.created_at) < lastMonth
         );
 
@@ -80,8 +84,9 @@ export default function Dashboard() {
           monthlyGrowth,
         });
 
-      } catch (error: any) {
-        toast.error(error.message || 'Błąd podczas ładowania danych');
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Błąd podczas ładowania danych';
+        toast.error(errorMessage);
         if (!profile) {
           navigate('/login');
         }
@@ -91,7 +96,7 @@ export default function Dashboard() {
     }
 
     loadData();
-  }, [user, navigate]);
+  }, [user, navigate, profile]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,33 +105,32 @@ export default function Dashboard() {
     try {
       const result = await profiles.update(user.id, formData);
       
-      if (result.success) {
+      if (result.success && result.data) {
         setProfile(result.data);
         setEditing(false);
         toast.success('Profil został zaktualizowany');
       } else {
         throw new Error(result.error);
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Błąd podczas aktualizacji profilu');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Błąd podczas aktualizacji profilu';
+      toast.error(errorMessage);
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-xl text-gray-600">Ładowanie...</p>
-          </div>
+      <DashboardLayout>
+        <div className="text-center">
+          <p className="text-xl text-gray-600">Ładowanie...</p>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <DashboardLayout>
+      <div>
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Panel twórcy</h1>
           <p className="mt-1 text-sm text-gray-500">
@@ -385,6 +389,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

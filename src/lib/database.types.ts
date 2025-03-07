@@ -10,6 +10,8 @@ export interface Database {
           avatar_url: string | null;
           created_at: string;
           updated_at: string;
+          total_donations: number;
+          available_balance: number;
         };
         Insert: {
           id: string;
@@ -19,6 +21,8 @@ export interface Database {
           avatar_url?: string | null;
           created_at?: string;
           updated_at?: string;
+          total_donations?: number;
+          available_balance?: number;
         };
         Update: {
           id?: string;
@@ -28,6 +32,8 @@ export interface Database {
           avatar_url?: string | null;
           created_at?: string;
           updated_at?: string;
+          total_donations?: number;
+          available_balance?: number;
         };
       };
       payments: {
@@ -41,6 +47,7 @@ export interface Database {
           payer_name: string | null;
           payer_email: string | null;
           created_at: string;
+          payment_type: string | null;
         };
         Insert: {
           id?: string;
@@ -52,6 +59,7 @@ export interface Database {
           payer_name?: string | null;
           payer_email?: string | null;
           created_at?: string;
+          payment_type?: string | null;
         };
         Update: {
           id?: string;
@@ -63,6 +71,7 @@ export interface Database {
           payer_name?: string | null;
           payer_email?: string | null;
           created_at?: string;
+          payment_type?: string | null;
         };
       };
     };

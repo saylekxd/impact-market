@@ -8,6 +8,7 @@ import BankAccountForm from '../components/BankAccountForm';
 import PayoutHistory from '../components/PayoutHistory';
 import PayoutRequest from '../components/PayoutRequest';
 import { Wallet, CreditCard, Clock } from 'lucide-react';
+import DashboardLayout from '../components/DashboardLayout';
 
 export default function Finances() {
   const navigate = useNavigate();
@@ -71,27 +72,31 @@ export default function Finances() {
 
   if (profileLoading || payoutsLoading || paymentsLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-500">Ładowanie...</p>
-      </div>
+      <DashboardLayout>
+        <div className="flex items-center justify-center">
+          <p className="text-gray-500">Ładowanie...</p>
+        </div>
+      </DashboardLayout>
     );
   }
 
   if (!profile) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-red-500">Nie udało się załadować profilu</p>
-      </div>
+      <DashboardLayout>
+        <div className="flex items-center justify-center">
+          <p className="text-red-500">Nie udało się załadować profilu</p>
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="py-6">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-        <h1 className="text-2xl font-semibold text-gray-900">Finanse</h1>
+    <DashboardLayout>
+      <div>
+        <h1 className="text-2xl font-semibold text-gray-900 mb-6">Finanse</h1>
 
         {/* Statystyki */}
-        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="p-5">
               <div className="flex items-center">
@@ -156,7 +161,7 @@ export default function Finances() {
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 mb-8">
           {/* Dane bankowe */}
           <div className="bg-white shadow rounded-lg">
             <div className="px-6 py-5 border-b border-gray-200">
@@ -197,7 +202,7 @@ export default function Finances() {
         </div>
 
         {/* Historia wypłat */}
-        <div className="mt-8 bg-white shadow rounded-lg">
+        <div className="bg-white shadow rounded-lg">
           <div className="px-6 py-5 border-b border-gray-200">
             <h3 className="text-lg font-medium leading-6 text-gray-900">
               Historia wypłat
@@ -214,6 +219,6 @@ export default function Finances() {
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

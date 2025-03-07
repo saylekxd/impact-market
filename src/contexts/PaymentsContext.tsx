@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { useProfile } from './ProfileContext';
 import { supabase } from '../lib/supabase';
 import { toast } from 'react-hot-toast';
 import type { Database } from '../lib/database.types';
@@ -24,6 +25,7 @@ const PaymentsContext = createContext<PaymentsContextType>({
 
 export function PaymentsProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
+  const { ensureProfile } = useProfile();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
@@ -34,6 +36,13 @@ export function PaymentsProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     try {
       console.log('Loading payments for user:', user.id);
+
+      // Ensure profile exists first
+      const profile = await ensureProfile();
+      if (!profile) {
+        console.error('Cannot load payments: Profile not available');
+        return;
+      }
 
       // Get all payments without status filter
       const { data: payments, error } = await supabase
@@ -50,14 +59,17 @@ export function PaymentsProvider({ children }: { children: React.ReactNode }) {
         return payment.status === 'completed' ? sum + payment.amount : sum;
       }, 0) || 0;
 
-      // Update profile with new total
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ total_donations: calculatedTotal })
-        .eq('id', user.id);
+      // Get the profile to see current total_donations
+      if (profile.total_donations !== calculatedTotal) {
+        // Only update if there's a difference
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ total_donations: calculatedTotal })
+          .eq('id', user.id);
 
-      if (updateError) {
-        console.error('Error updating total donations:', updateError);
+        if (updateError) {
+          console.error('Error updating total donations:', updateError);
+        }
       }
 
       console.log('All payments:', payments);
@@ -71,7 +83,7 @@ export function PaymentsProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, ensureProfile]);
 
   useEffect(() => {
     if (user) {
@@ -86,6 +98,13 @@ export function PaymentsProvider({ children }: { children: React.ReactNode }) {
     if (!user) return false;
 
     try {
+      // Ensure profile exists first
+      const profile = await ensureProfile();
+      if (!profile) {
+        toast.error('Nie można utworzyć płatności bez profilu');
+        return false;
+      }
+
       const { data, error } = await supabase
         .from('payments')
         .insert({
@@ -106,7 +125,7 @@ export function PaymentsProvider({ children }: { children: React.ReactNode }) {
       toast.error('Nie udało się utworzyć płatności');
       return false;
     }
-  }, [user, loadPayments]);
+  }, [user, ensureProfile, loadPayments]);
 
   return (
     <PaymentsContext.Provider value={{
