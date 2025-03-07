@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { usePayments } from '../contexts/PaymentsContext';
 import { toast } from 'react-hot-toast';
 import { profiles } from '../lib/profiles';
-import { donations } from '../lib/donations';
 import type { Profile } from '../lib/profiles';
-import type { Payment } from '../lib/donations';
 import { TrendingUp, Users, CreditCard, Calendar, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
 
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { payments, loading: paymentsLoading } = usePayments();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [stats, setStats] = useState({
@@ -51,24 +50,15 @@ export default function Dashboard() {
           });
         }
 
-        // Load payments
-        const paymentsResult = await donations.getByCreatorId(user?.id || '');
-        if (!paymentsResult.success) {
-          throw new Error(paymentsResult.error);
-        }
-        
-        const paymentData = paymentsResult.data || [];
-        setPayments(paymentData);
-
         // Calculate statistics
         const now = new Date();
         const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
         const twoMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, 1);
 
-        const totalAmount = paymentData.reduce((sum, p) => sum + p.amount, 0);
-        const uniqueDonors = new Set(paymentData.map(p => p.payer_email || p.payer_name)).size;
-        const lastMonthPayments = paymentData.filter(p => new Date(p.created_at) >= lastMonth);
-        const previousMonthPayments = paymentData.filter(p => 
+        const totalAmount = payments.reduce((sum, p) => sum + p.amount, 0);
+        const totalPaymentsCount = payments.length;
+        const lastMonthPayments = payments.filter(p => new Date(p.created_at) >= lastMonth);
+        const previousMonthPayments = payments.filter(p => 
           new Date(p.created_at) >= twoMonthsAgo && new Date(p.created_at) < lastMonth
         );
 
@@ -79,7 +69,7 @@ export default function Dashboard() {
 
         setStats({
           totalAmount,
-          donorsCount: uniqueDonors,
+          donorsCount: totalPaymentsCount,
           lastMonthAmount,
           monthlyGrowth,
         });
@@ -96,7 +86,7 @@ export default function Dashboard() {
     }
 
     loadData();
-  }, [user, navigate, profile]);
+  }, [user, navigate, profile, payments]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,7 +108,7 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) {
+  if (loading || paymentsLoading) {
     return (
       <DashboardLayout>
         <div className="text-center">
