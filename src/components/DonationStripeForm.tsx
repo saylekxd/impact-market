@@ -19,7 +19,7 @@ const PREDEFINED_AMOUNTS = [
 ];
 
 export default function DonationStripeForm({ 
-  creatorId, 
+  creatorId,
   creatorName,
   onSuccess,
   onCancel 
@@ -33,12 +33,13 @@ export default function DonationStripeForm({
   const [payerName, setPayerName] = useState('');
   const [payerEmail, setPayerEmail] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [donationId, setDonationId] = useState<string | null>(null);
 
   // Calculate the amount in cents
   const amount = customAmount ? parseInt(customAmount) * 100 : selectedAmount;
 
   // Handle form submission to advance to payment
-  const handleProceedToPayment = (e: React.FormEvent) => {
+  const handleProceedToPayment = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (amount < 100) {
@@ -46,15 +47,10 @@ export default function DonationStripeForm({
       return;
     }
     
-    setStep('payment');
-  };
-
-  // Handle successful payment
-  const handlePaymentSuccess = async (paymentIntentId: string) => {
     try {
       setIsProcessing(true);
       
-      // Record the donation in your database
+      // Create the donation record first
       const result = await donations.create({
         creator_id: creatorId,
         amount,
@@ -64,34 +60,14 @@ export default function DonationStripeForm({
         payer_email: payerEmail || null,
         payment_type: 'stripe',
       });
-
+      
       if (result.success && result.data?.id) {
-        // Store the Stripe payment ID reference
-        try {
-          const response = await fetch('/api/payment-info', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              paymentId: result.data.id,
-              stripePaymentId: paymentIntentId
-            }),
-          });
-
-          if (!response.ok) {
-            console.error('Failed to store payment reference');
-          }
-        } catch (err) {
-          console.error('Error storing payment reference:', err);
-        }
-        
-        toast.success('Dziękujemy za wsparcie!');
-        if (onSuccess) {
-          onSuccess();
-        }
+        // Store the donation ID for reference
+        setDonationId(result.data.id);
+        // Once donation is created in the database, proceed to payment step
+        setStep('payment');
       } else {
-        throw new Error(result.error || 'Nieznany błąd podczas tworzenia płatności');
+        throw new Error(result.error || 'Wystąpił błąd podczas przygotowania płatności');
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -101,12 +77,46 @@ export default function DonationStripeForm({
     }
   };
 
+  // Handle successful payment
+  const handlePaymentSuccess = async (paymentIntentId: string) => {
+    try {
+      // Store the Stripe payment ID reference
+      try {
+        const response = await fetch('/api/payment-info', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            stripePaymentId: paymentIntentId
+          }),
+        });
+
+        if (!response.ok) {
+          console.error('Failed to store payment reference');
+        } else {
+          console.log('Payment reference stored successfully');
+          toast.success('Dziękujemy za wsparcie!');
+          if (onSuccess) {
+            onSuccess();
+          }
+        }
+      } catch (err) {
+        console.error('Error storing payment reference:', err);
+        toast.error('Wystąpił błąd podczas zapisywania płatności');
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Wystąpił błąd: ${errorMessage}`);
+      if (onCancel) {
+        onCancel();
+      }
+    }
+  };
+
   // Handle payment error
   const handlePaymentError = (errorMessage: string) => {
     toast.error(`Payment error: ${errorMessage}`);
-    setIsProcessing(false);
-    
-    // Call the onCancel callback if provided
     if (onCancel) {
       onCancel();
     }

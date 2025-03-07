@@ -107,14 +107,83 @@ app.post('/api/create-payment-intent', rateLimiter, async (req, res) => {
   }
 });
 
+// Create checkout session endpoint with rate limiting
+app.post('/api/create-checkout-session', rateLimiter, async (req, res) => {
+  try {
+    console.log('Creating checkout session with data:', req.body);
+    const { paymentId, amount, currency, description, email, name } = req.body;
+
+    // Validate required fields
+    if (!paymentId || !amount || !currency) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Create a checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: currency.toLowerCase(),
+            product_data: {
+              name: description || 'Support donation',
+            },
+            unit_amount: amount, // amount in smallest currency unit (e.g. cents)
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${req.headers.origin || 'http://localhost:5174'}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.origin || 'http://localhost:5174'}/payment/cancel`,
+      customer_email: email || undefined,
+      metadata: {
+        payment_id: paymentId,
+        name: name || undefined,
+      },
+    });
+
+    console.log('Created checkout session:', session.id);
+
+    // Return the session details
+    return res.json({
+      id: session.id,
+      url: session.url,
+    });
+  } catch (error) {
+    console.error('Error creating checkout session:', error);
+    return res.status(500).json({ 
+      error: 'Failed to create checkout session',
+      message: error.message
+    });
+  }
+});
+
 // Payment info endpoint
 app.post('/api/payment-info', rateLimiter, async (req, res) => {
   try {
-    console.log('Storing payment info:', req.body);
-    return res.json({ success: true });
+    const { stripePaymentId } = req.body;
+    
+    // Validate required fields
+    if (!stripePaymentId) {
+      return res.status(400).json({ error: 'Missing stripePaymentId' });
+    }
+    
+    console.log('Successfully processed payment with Stripe ID:', stripePaymentId);
+    
+    // In a real implementation, you would update the payment status in your database
+    // await supabase.from('payments').update({ status: 'completed' }).eq('external_reference', stripePaymentId);
+    
+    return res.json({ 
+      success: true,
+      message: 'Payment processed successfully' 
+    });
   } catch (error) {
     console.error('Error storing payment info:', error);
-    return res.status(500).json({ error: 'Failed to store payment info' });
+    return res.status(500).json({ 
+      error: 'Failed to store payment info',
+      message: error.message 
+    });
   }
 });
 
