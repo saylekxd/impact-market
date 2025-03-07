@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { payments } from './payments';
+import { createCheckoutSession } from './stripe';
 import { Database } from './database.types';
 
 export type Payment = Database['public']['Tables']['payments']['Row'];
@@ -24,11 +25,17 @@ export const donations = {
    */
   async create(payment: NewPayment): Promise<PaymentResult> {
     try {
+      // Make sure payment_type is included
+      const fullPayment = {
+        ...payment,
+        payment_type: payment.payment_type || 'stripe', // Default to stripe
+      };
+
       // Utwórz wpis w bazie danych
       const { data, error } = await supabase
         .from('payments')
         .insert({
-          ...payment,
+          ...fullPayment,
           status: 'pending',
         })
         .select()
@@ -37,22 +44,49 @@ export const donations = {
       if (error) throw error;
       if (!data) throw new Error('Nie udało się utworzyć płatności');
 
-      // Zainicjuj transakcję w systemie płatności
-      const p24Result = await payments.initializeTransaction(data);
+      // Determine which payment processor to use
+      let paymentResult;
       
-      if (p24Result.error) {
-        throw new Error(p24Result.error);
+      // Use Stripe as the default payment processor
+      if (!data.payment_type || data.payment_type === 'stripe') {
+        const checkoutResult = await createCheckoutSession(
+          data.id,
+          data.amount,
+          'PLN',
+          data.email,
+          data.name,
+          data.message
+        );
+        
+        if (checkoutResult.error) {
+          throw new Error(checkoutResult.error);
+        }
+        
+        paymentResult = {
+          data: {
+            redirectUrl: checkoutResult.sessionUrl
+          }
+        };
+      } else {
+        // Fallback to the original payment system (P24)
+        paymentResult = await payments.initializeTransaction(data);
+      }
+      
+      if (paymentResult.error) {
+        throw new Error(paymentResult.error);
       }
 
       return {
         success: true,
         data,
-        redirectUrl: p24Result.data.redirectUrl,
+        redirectUrl: paymentResult.data.redirectUrl,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      console.error('Payment creation error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       return {
         success: false,
-        error: 'Wystąpił błąd podczas przetwarzania płatności',
+        error: errorMessage || 'Wystąpił błąd podczas przetwarzania płatności',
       };
     }
   },
@@ -72,10 +106,11 @@ export const donations = {
       if (error) throw error;
 
       return { success: true, data: data || [] };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       return {
         success: false,
-        error: 'Wystąpił błąd podczas pobierania historii płatności',
+        error: errorMessage || 'Wystąpił błąd podczas pobierania historii płatności',
       };
     }
   },
@@ -95,10 +130,11 @@ export const donations = {
 
       const total = (data || []).reduce((sum, payment) => sum + payment.amount, 0);
       return { success: true, total };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       return {
         success: false,
-        error: 'Wystąpił błąd podczas obliczania sumy wpłat',
+        error: errorMessage || 'Wystąpił błąd podczas obliczania sumy wpłat',
       };
     }
   },

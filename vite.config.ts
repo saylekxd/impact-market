@@ -32,6 +32,14 @@ export default defineConfig({
       // Increase timeout for HMR connection
       timeout: 5000,
     },
+    // Add proxy configuration for API endpoints
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   resolve: {
     alias: {
