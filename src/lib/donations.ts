@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import { payments } from './payments';
-import { createCheckoutSession } from './stripe';
+import { createCheckoutSession, testApiConnection } from './stripe';
 import { Database } from './database.types';
 
 export type Payment = Database['public']['Tables']['payments']['Row'];
@@ -25,6 +25,15 @@ export const donations = {
    */
   async create(payment: NewPayment): Promise<PaymentResult> {
     try {
+      // First check if payment API is available before creating anything in the database
+      const apiStatus = await testApiConnection();
+      if (!apiStatus.success) {
+        return {
+          success: false,
+          error: 'Serwis płatności jest obecnie niedostępny. Prosimy spróbować później.'
+        };
+      }
+      
       // Make sure payment_type is included
       const fullPayment = {
         ...payment,
@@ -59,6 +68,12 @@ export const donations = {
         );
         
         if (checkoutResult.error) {
+          // If there was an error with payment processing, delete the database entry to prevent orphaned records
+          await supabase
+            .from('payments')
+            .delete()
+            .eq('id', data.id);
+            
           throw new Error(checkoutResult.error);
         }
         

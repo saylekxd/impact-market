@@ -3,8 +3,48 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Initialize Supabase client
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+let supabase;
+
+if (supabaseUrl && supabaseKey) {
+  supabase = createClient(supabaseUrl, supabaseKey);
+  console.log('Supabase client initialized');
+  
+  // Check if the database schema is as expected
+  (async () => {
+    try {
+      // Try to fetch a payment to check its structure
+      const { data: samplePayment, error: sampleError } = await supabase
+        .from('payments')
+        .select('*')
+        .limit(1)
+        .single();
+      
+      if (sampleError && !sampleError.message.includes('No rows found')) {
+        console.error('Error accessing payments table:', sampleError);
+      } else if (samplePayment) {
+        // Log available columns for reference
+        console.log('Available columns in payments table:', Object.keys(samplePayment));
+        
+        // Check if external_reference exists in the columns
+        if (!('external_reference' in samplePayment)) {
+          console.warn('WARNING: external_reference column is missing from payments table');
+          console.warn('Please apply the migration in supabase/migrations/20250212999999_add_external_reference.sql');
+        }
+      }
+    } catch (err) {
+      console.error('Error during schema check:', err);
+    }
+  })();
+} else {
+  console.warn('Supabase credentials missing, database updates will not work');
+}
 
 // In-memory rate limiting and deduplication
 const requestCache = new Map();
@@ -162,34 +202,133 @@ app.post('/api/create-checkout-session', rateLimiter, async (req, res) => {
 // Payment info endpoint
 app.post('/api/payment-info', rateLimiter, async (req, res) => {
   try {
-    const { stripePaymentId } = req.body;
+    const { paymentId, stripePaymentId } = req.body;
     
     // Validate required fields
-    if (!stripePaymentId) {
-      return res.status(400).json({ error: 'Missing stripePaymentId' });
+    if (!paymentId || !stripePaymentId) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
     
-    console.log('Successfully processed payment with Stripe ID:', stripePaymentId);
+    // Check if supabase is initialized
+    if (!supabase) {
+      return res.status(500).json({ 
+        error: 'Database not available',
+        message: 'Supabase client is not initialized'
+      });
+    }
     
-    // In a real implementation, you would update the payment status in your database
-    // await supabase.from('payments').update({ status: 'completed' }).eq('external_reference', stripePaymentId);
-    
-    return res.json({ 
-      success: true,
-      message: 'Payment processed successfully' 
-    });
+    // Verify the payment status with Stripe before updating the database
+    try {
+      const paymentIntent = await stripe.paymentIntents.retrieve(stripePaymentId);
+      
+      // Only proceed if the payment is confirmed as successful by Stripe
+      if (paymentIntent.status !== 'succeeded') {
+        return res.status(400).json({ 
+          error: 'Payment not succeeded',
+          message: `Payment status is ${paymentIntent.status}`
+        });
+      }
+      
+      console.log('Successfully verified payment with Stripe ID:', stripePaymentId);
+      
+      // First, fetch a payment to inspect its structure
+      const { data: paymentData, error: fetchError } = await supabase
+        .from('payments')
+        .select('*')
+        .eq('id', paymentId)
+        .single();
+        
+      if (fetchError) {
+        console.error('Error fetching payment:', fetchError);
+        return res.status(500).json({
+          error: 'Failed to fetch payment record',
+          message: fetchError.message
+        });
+      }
+      
+      // Log the payment structure to see available columns
+      console.log('Payment record structure:', Object.keys(paymentData || {}));
+      
+      // Prepare update data based on available columns
+      const updateData = {
+        status: 'completed'
+      };
+      
+      // Only include external_reference if it exists in the schema
+      if (Object.keys(paymentData || {}).includes('external_reference')) {
+        updateData.external_reference = stripePaymentId;
+      } else {
+        console.warn('Column external_reference not found in payments table, skipping update of this field');
+      }
+      
+      // Update the payment status in the database
+      const { error: dbError } = await supabase
+        .from('payments')
+        .update(updateData)
+        .eq('id', paymentId);
+      
+      if (dbError) {
+        console.error('Database error:', dbError);
+        return res.status(500).json({ 
+          error: 'Failed to update payment record',
+          message: dbError.message
+        });
+      }
+      
+      return res.json({ 
+        success: true,
+        message: 'Payment processed and recorded successfully' 
+      });
+    } catch (stripeError) {
+      console.error('Stripe verification error:', stripeError);
+      return res.status(500).json({ 
+        error: 'Failed to verify payment with Stripe',
+        message: stripeError.message
+      });
+    }
   } catch (error) {
-    console.error('Error storing payment info:', error);
+    console.error('Error processing payment info:', error);
     return res.status(500).json({ 
-      error: 'Failed to store payment info',
+      error: 'Failed to process payment info',
       message: error.message 
     });
   }
 });
 
-// Simple test endpoint
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'API is working!' });
+// Simple test endpoint that checks if Stripe is initialized
+app.get('/api/test', async (req, res) => {
+  try {
+    // Check if Stripe is initialized
+    if (!stripe) {
+      return res.status(503).json({ 
+        error: 'Payment service unavailable', 
+        message: 'Stripe is not initialized'
+      });
+    }
+    
+    // Make a simple call to Stripe API to verify connectivity
+    try {
+      // Get Stripe account info to verify connection works
+      const account = await stripe.accounts.retrieve();
+      return res.json({ 
+        message: 'API is working!',
+        stripe_status: 'connected',
+        account_id: account.id
+      });
+    } catch (stripeError) {
+      console.error('Stripe API connectivity test failed:', stripeError);
+      return res.status(503).json({ 
+        error: 'Payment service unavailable', 
+        message: 'Could not connect to Stripe API'
+      });
+    }
+  } catch (error) {
+    console.error('Test endpoint error:', error);
+    return res.status(500).json({ 
+      error: 'Server error', 
+      message: error.message
+    });
+  }
 });
 
 // Create a payment test page
