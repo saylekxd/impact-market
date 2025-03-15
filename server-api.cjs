@@ -358,6 +358,8 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error', message: err.message });
 });
 
+console.log("Fetching payment with ID:", paymentId);
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Stripe API server running on port ${PORT}`);
