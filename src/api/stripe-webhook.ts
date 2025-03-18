@@ -64,7 +64,12 @@ export default async function handler(req: Request): Promise<Response> {
             .from('payments')
             .update({ 
               status: 'completed',
-              // Add any additional data you want to store
+              stripe_session_id: session.id, // Ensure session ID is stored
+              completed_at: new Date().toISOString(),
+              payment_amount: session.amount_total,
+              payment_currency: session.currency?.toUpperCase(),
+              customer_email: session.customer_email || null,
+              customer_name: session.metadata?.name || null
             })
             .eq('id', paymentId);
             

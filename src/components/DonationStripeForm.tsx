@@ -60,7 +60,7 @@ export default function DonationStripeForm({
 
   // Handle form submission to advance to payment
   const handleProceedToPayment = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission
     
     if (amount < 100) {
       toast.error('Minimalna kwota to 1 zł');
@@ -95,7 +95,15 @@ export default function DonationStripeForm({
       if (result.success && result.data?.id) {
         // Store the donation ID for reference
         setDonationId(result.data.id);
-        // Once donation is created in the database, proceed to payment step
+        
+        // If we have a redirect URL from Stripe, redirect the user there
+        if (result.redirectUrl) {
+          // Redirect to Stripe Checkout
+          window.location.href = result.redirectUrl;
+          return; // Early return after redirect
+        }
+        
+        // Fallback to the older payment step flow if no redirect URL
         setStep('payment');
       } else {
         throw new Error(result.error || 'Wystąpił błąd podczas przygotowania płatności');

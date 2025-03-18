@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import Finances from './pages/Finances';
 import PaymentTest from './pages/PaymentTest';
 import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentCancel from './pages/PaymentCancel';
 
 export default function AppRoutes() {
   return (
@@ -23,6 +24,7 @@ export default function AppRoutes() {
         <Route path="/:username" element={<CreatorProfile />} />
         <Route path="/payment/test" element={<PaymentTest />} />
         <Route path="/payment/success" element={<PaymentSuccess />} />
+        <Route path="/payment/cancel" element={<PaymentCancel />} />
       </Routes>
     </>
   );

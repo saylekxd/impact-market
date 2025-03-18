@@ -71,11 +71,13 @@ export default async function handler(req: Request): Promise<Response> {
       },
     });
 
-    // Update the payment with Stripe info
+    // Update the payment with Stripe info including the session ID
     await supabase
       .from('payments')
       .update({
         payment_type: 'stripe',
+        stripe_session_id: session.id,
+        status: 'pending'
       })
       .eq('id', paymentId);
 
