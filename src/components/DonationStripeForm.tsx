@@ -145,6 +145,9 @@ export default function DonationStripeForm({
             if (onSuccess) {
               onSuccess();
             }
+            
+            // Redirect to success page after showing toast
+            redirectToSuccessPage(paymentIntentId);
             return;
           }
           
@@ -157,6 +160,9 @@ export default function DonationStripeForm({
           if (onSuccess) {
             onSuccess();
           }
+          
+          // Redirect to success page after showing toast
+          redirectToSuccessPage(paymentIntentId);
         }
       } catch (err) {
         console.error('Error storing payment reference:', err);
@@ -167,6 +173,9 @@ export default function DonationStripeForm({
         if (onSuccess) {
           onSuccess();
         }
+        
+        // Redirect to success page after showing toasts
+        redirectToSuccessPage(paymentIntentId);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -175,6 +184,15 @@ export default function DonationStripeForm({
         onCancel();
       }
     }
+  };
+  
+  // Helper function to redirect to success page
+  const redirectToSuccessPage = (paymentIntentId: string) => {
+    // Short delay to allow toast to be seen
+    setTimeout(() => {
+      // Use window.location to navigate to the success page with parameters
+      window.location.href = `/payment/success?username=${encodeURIComponent(creatorName)}&amount=${amount}&payment_id=${paymentIntentId}`;
+    }, 1500);
   };
 
   // Handle payment error

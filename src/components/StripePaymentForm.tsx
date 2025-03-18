@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { toast } from 'react-hot-toast';
 import { createPaymentIntent, testApiConnection } from '../lib/stripe';
+import { CheckCircle } from 'lucide-react';
 
 interface StripePaymentFormProps {
   amount: number;
@@ -59,6 +60,7 @@ export default function StripePaymentForm({
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [apiStatus, setApiStatus] = useState<'checking' | 'connected' | 'error'>('checking');
+  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
   
   // Prevent duplicate API calls
   const paymentIntentRequested = useRef(false);
@@ -172,6 +174,7 @@ export default function StripePaymentForm({
 
     // Set processing state
     setIsProcessing(true);
+    setPaymentStatus('processing');
     if (onProcessingChange) {
       onProcessingChange(true);
     }
@@ -196,7 +199,19 @@ export default function StripePaymentForm({
       } else if (paymentIntent.status === 'succeeded') {
         console.log('Payment successful!', paymentIntent.id);
         toast.success('Payment successful!');
+        
+        // Set payment success state
+        setPaymentStatus('success');
+        
+        // Notify parent component
         onPaymentSuccess(paymentIntent.id);
+        
+        // Clear form and reset state after 2 seconds to allow time to see success message
+        setTimeout(() => {
+          if (elements.getElement(CardElement)) {
+            elements.getElement(CardElement)?.clear();
+          }
+        }, 2000);
       } else {
         throw new Error(`Payment status: ${paymentIntent.status}`);
       }
@@ -204,6 +219,7 @@ export default function StripePaymentForm({
       const errorMessage = error instanceof Error ? error.message : 'Payment failed';
       console.error('Payment error:', errorMessage);
       setPaymentError(errorMessage);
+      setPaymentStatus('error');
       onPaymentError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -220,6 +236,24 @@ export default function StripePaymentForm({
         <div className="p-4 bg-gray-100 rounded text-center">
           <p>Connecting to payment service...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Show success UI instead of the form when payment is successful
+  if (paymentStatus === 'success') {
+    return (
+      <div className="stripe-payment-success p-6 text-center">
+        <div className="mb-4 flex justify-center">
+          <CheckCircle className="h-12 w-12 text-green-500" />
+        </div>
+        <h3 className="text-xl font-medium text-gray-900 mb-2">Payment Successful!</h3>
+        <p className="text-gray-600 mb-4">
+          Thank you for your payment of {(amount / 100).toFixed(2)} {currency}
+        </p>
+        <p className="text-sm text-gray-500">
+          Redirecting you back to the profile...
+        </p>
       </div>
     );
   }
