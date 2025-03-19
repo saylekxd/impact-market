@@ -9,33 +9,43 @@ const PORT = process.env.PORT || 3001;
 
 // Initialize Supabase client
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+const supabaseKey = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 let supabase;
 
 if (supabaseUrl && supabaseKey) {
-  supabase = createClient(supabaseUrl, supabaseKey);
-  console.log('Supabase client initialized');
+  supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+  console.log('Supabase client initialized with', 
+    supabaseKey === process.env.VITE_SUPABASE_SERVICE_ROLE_KEY ? 'service role key' : 'anon key');
   
   // Check if the database schema is as expected
   (async () => {
     try {
-      // Try to fetch a payment to check its structure
-      const { data: samplePayment, error: sampleError } = await supabase
+      // Try to fetch payments table structure
+      const { data: payments, error } = await supabase
         .from('payments')
         .select('*')
-        .limit(1)
-        .single();
+        .limit(1);
       
-      if (sampleError && !sampleError.message.includes('No rows found')) {
-        console.error('Error accessing payments table:', sampleError);
-      } else if (samplePayment) {
-        // Log available columns for reference
-        console.log('Available columns in payments table:', Object.keys(samplePayment));
-        
-        // Check if external_reference exists in the columns
-        if (!('external_reference' in samplePayment)) {
-          console.warn('WARNING: external_reference column is missing from payments table');
-          console.warn('Please apply the migration in supabase/migrations/20250212999999_add_external_reference.sql');
+      if (error) {
+        console.error('Error accessing payments table:', error);
+      } else {
+        // If we got data, check the structure
+        if (payments && payments.length > 0) {
+          const samplePayment = payments[0];
+          console.log('Available columns in payments table:', Object.keys(samplePayment));
+          
+          // Check if external_reference exists in the columns
+          if (!('external_reference' in samplePayment)) {
+            console.warn('WARNING: external_reference column is missing from payments table');
+            console.warn('Please apply the migration in supabase/migrations/20250212999999_add_external_reference.sql');
+          }
+        } else {
+          console.log('Payments table exists but is empty - schema structure will be validated on first payment');
         }
       }
     } catch (err) {
@@ -50,8 +60,15 @@ if (supabaseUrl && supabaseKey) {
 const requestCache = new Map();
 const CACHE_TTL = 60 * 1000; // 1 minute
 
+// Configure CORS to allow requests from the frontend
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3001'],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'stripe-signature']
+}));
+
 // Middleware
-app.use(cors());
 app.use(express.json());
 
 // Serve static files from the root directory
@@ -59,7 +76,7 @@ app.use(express.static(path.join(__dirname)));
 
 // Log all requests for debugging
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url} - Origin: ${req.headers.origin}`);
   next();
 });
 
@@ -126,12 +143,8 @@ app.post('/api/create-payment-intent', rateLimiter, async (req, res) => {
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: currency.toLowerCase(),
-      // Add explicit payment_method_types to ensure BLIK is included
+      // Use specific payment methods instead of automatic detection
       payment_method_types: ['card', 'blik'],
-      // Keep automatic_payment_methods as a fallback for other methods
-      automatic_payment_methods: {
-        enabled: true,
-      },
     });
 
     console.log('Created payment intent:', paymentIntent.id);
@@ -205,11 +218,22 @@ app.post('/api/create-checkout-session', rateLimiter, async (req, res) => {
 // Payment info endpoint
 app.post('/api/payment-info', rateLimiter, async (req, res) => {
   try {
-    const { paymentId, stripePaymentId } = req.body;
+    console.log('Received payment info request:', { 
+      paymentId: req.body.paymentId,
+      stripePaymentId: req.body.stripePaymentId,
+      creator_id: req.body.creator_id,
+      headers: req.headers
+    });
+    
+    const { paymentId, stripePaymentId, creator_id } = req.body;
     
     // Validate required fields
     if (!paymentId || !stripePaymentId) {
-      return res.status(400).json({ error: 'Missing required fields' });
+      return res.status(400).json({ error: 'Missing required fields: paymentId and stripePaymentId are required' });
+    }
+
+    if (!creator_id) {
+      return res.status(400).json({ error: 'Missing required field: creator_id is required' });
     }
     
     // Check if supabase is initialized
@@ -223,6 +247,7 @@ app.post('/api/payment-info', rateLimiter, async (req, res) => {
     // Verify the payment status with Stripe before updating the database
     try {
       const paymentIntent = await stripe.paymentIntents.retrieve(stripePaymentId);
+      console.log('Retrieved payment intent:', paymentIntent);
       
       // Only proceed if the payment is confirmed as successful by Stripe
       if (paymentIntent.status !== 'succeeded') {
@@ -234,53 +259,63 @@ app.post('/api/payment-info', rateLimiter, async (req, res) => {
       
       console.log('Successfully verified payment with Stripe ID:', stripePaymentId);
       
-      // First, fetch a payment to inspect its structure
-      const { data: paymentData, error: fetchError } = await supabase
+      // First verify the payment exists and belongs to the creator
+      const { data: payments, error: fetchError } = await supabase
         .from('payments')
-        .select('*')
+        .select('id')
         .eq('id', paymentId)
-        .single();
-        
+        .eq('creator_id', creator_id);
+
       if (fetchError) {
-        console.error('Error fetching payment:', fetchError);
-        return res.status(500).json({
-          error: 'Failed to fetch payment record',
+        console.error('Error checking payment:', fetchError);
+        return res.status(500).json({ 
+          error: 'Failed to check payment record',
           message: fetchError.message
         });
       }
-      
-      // Log the payment structure to see available columns
-      console.log('Payment record structure:', Object.keys(paymentData || {}));
-      
-      // Prepare update data based on available columns
-      const updateData = {
-        status: 'completed'
-      };
-      
-      // Only include external_reference if it exists in the schema
-      if (Object.keys(paymentData || {}).includes('external_reference')) {
-        updateData.external_reference = stripePaymentId;
-      } else {
-        console.warn('Column external_reference not found in payments table, skipping update of this field');
-      }
-      
-      // Update the payment status in the database
-      const { error: dbError } = await supabase
-        .from('payments')
-        .update(updateData)
-        .eq('id', paymentId);
-      
-      if (dbError) {
-        console.error('Database error:', dbError);
-        return res.status(500).json({ 
-          error: 'Failed to update payment record',
-          message: dbError.message
+
+      if (!payments || payments.length === 0) {
+        console.error('Payment not found or does not belong to creator:', { paymentId, creator_id });
+        return res.status(404).json({
+          error: 'Payment not found',
+          message: 'Payment record not found or does not belong to the specified creator'
         });
       }
-      
+
+      // Update the payment
+      const { data: updatedPayments, error: updateError } = await supabase
+        .from('payments')
+        .update({
+          status: 'completed',
+          external_reference: stripePaymentId,
+          stripe_id: stripePaymentId,
+          amount: paymentIntent.amount,
+          currency: paymentIntent.currency.toLowerCase()
+        })
+        .eq('id', paymentId)
+        .eq('creator_id', creator_id)
+        .select();
+
+      if (updateError) {
+        console.error('Error updating payment:', updateError);
+        return res.status(500).json({ 
+          error: 'Failed to update payment record',
+          message: updateError.message
+        });
+      }
+
+      if (!updatedPayments || updatedPayments.length === 0) {
+        console.error('No payment was updated');
+        return res.status(500).json({
+          error: 'Failed to update payment',
+          message: 'No payment was updated'
+        });
+      }
+
       return res.json({ 
         success: true,
-        message: 'Payment processed and recorded successfully' 
+        message: 'Payment processed and recorded successfully',
+        payment: updatedPayments[0]
       });
     } catch (stripeError) {
       console.error('Stripe verification error:', stripeError);
@@ -360,8 +395,6 @@ app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error', message: err.message });
 });
-
-console.log("Fetching payment with ID:", paymentId);
 
 // Start the server
 app.listen(PORT, () => {

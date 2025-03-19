@@ -4,6 +4,7 @@
       "@stripe/react-stripe-js": "^3.3.0",
       "@stripe/stripe-js": "^5.10.0",
       "@supabase/supabase-js": "^2.39.7",
+      "@types/uuid": "^10.0.0",
       "cors": "^2.8.5",
       "crypto-js": "^4.2.0",
       "dotenv": "^16.4.7",
@@ -14,6 +15,7 @@
       "react-hot-toast": "^2.4.1",
       "react-router-dom": "^6.22.2",
       "stripe": "^17.7.0",
+      "uuid": "^11.1.0",
       "zod": "^3.22.4"
    },
    "devDependencies": {

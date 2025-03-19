@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { Coffee } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 import StripePaymentForm from './StripePaymentForm';
 import { donations } from '../lib/donations';
 import { testApiConnection } from '../lib/stripe';
+import { API_BASE_URL, API_ENDPOINTS, DEFAULT_API_CONFIG } from '../config';
 
 interface DonationStripeFormProps {
   creatorId: string;
@@ -111,16 +113,22 @@ export default function DonationStripeForm({
   // Handle successful payment
   const handlePaymentSuccess = async (paymentIntentId: string) => {
     try {
+      // Ensure we have a donation ID
+      if (!donationId) {
+        console.error('No donation ID found');
+        toast.error('Błąd podczas przetwarzania płatności: brak identyfikatora wpłaty');
+        return;
+      }
+
       // Store the Stripe payment ID reference
       try {
-        const response = await fetch('/api/payment-info', {
+        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.paymentInfo}`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          ...DEFAULT_API_CONFIG,
           body: JSON.stringify({
-            paymentId: donationId,
-            stripePaymentId: paymentIntentId
+            paymentId: donationId, // Use the existing donationId
+            stripePaymentId: paymentIntentId,
+            creator_id: creatorId
           }),
         });
 
@@ -154,16 +162,16 @@ export default function DonationStripeForm({
           toast.error('Płatność została przyjęta, ale wystąpił błąd podczas aktualizacji statusu. Prosimy o kontakt z obsługą.');
           // Do not call onSuccess here as we couldn't confirm the payment status in our database
           return;
-        } else {
-          console.log('Payment reference stored successfully');
-          toast.success('Dziękujemy za wsparcie!');
-          if (onSuccess) {
-            onSuccess();
-          }
-          
-          // Redirect to success page after showing toast
-          redirectToSuccessPage(paymentIntentId);
         }
+        
+        console.log('Payment reference stored successfully');
+        toast.success('Dziękujemy za wsparcie!');
+        if (onSuccess) {
+          onSuccess();
+        }
+        
+        // Redirect to success page after showing toast
+        redirectToSuccessPage(paymentIntentId);
       } catch (err) {
         console.error('Error storing payment reference:', err);
         // If the payment was processed by Stripe but we have errors updating our database,
