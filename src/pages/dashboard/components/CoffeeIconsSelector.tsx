@@ -381,7 +381,7 @@ export default function CoffeeIconsSelector({ value, onChange }: CoffeeIconsSele
                       )}
                       className={`relative flex items-center p-3 rounded-lg border ${
                         isSelected 
-                          ? 'border-blue-500 bg-blue-50' 
+                          ? 'border-blue-500 bg-blue-51' 
                           : isRecommendedForTier
                             ? 'border-blue-200 bg-blue-50/30'
                             : (showSmallBadge || showMediumBadge || showLargeBadge)
