@@ -12,6 +12,12 @@ export interface Database {
           updated_at: string;
           total_donations: number;
           available_balance: number;
+          small_coffee_amount: number;
+          medium_coffee_amount: number;
+          large_coffee_amount: number;
+          small_icon: string;
+          medium_icon: string;
+          large_icon: string;
         };
         Insert: {
           id: string;
@@ -23,6 +29,12 @@ export interface Database {
           updated_at?: string;
           total_donations?: number;
           available_balance?: number;
+          small_coffee_amount?: number;
+          medium_coffee_amount?: number;
+          large_coffee_amount?: number;
+          small_icon?: string;
+          medium_icon?: string;
+          large_icon?: string;
         };
         Update: {
           id?: string;
@@ -34,6 +46,12 @@ export interface Database {
           updated_at?: string;
           total_donations?: number;
           available_balance?: number;
+          small_coffee_amount?: number;
+          medium_coffee_amount?: number;
+          large_coffee_amount?: number;
+          small_icon?: string;
+          medium_icon?: string;
+          large_icon?: string;
         };
       };
       payments: {
