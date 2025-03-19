@@ -11,6 +11,8 @@ export default function StripeProvider({ children }: StripeProviderProps) {
     appearance: {
       theme: 'stripe' as const,
     },
+    // This Elements instance will be used for CardElement only
+    // PaymentElement will have its own instance with clientSecret
   };
 
   return (

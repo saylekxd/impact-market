@@ -126,6 +126,9 @@ app.post('/api/create-payment-intent', rateLimiter, async (req, res) => {
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: currency.toLowerCase(),
+      // Add explicit payment_method_types to ensure BLIK is included
+      payment_method_types: ['card', 'blik'],
+      // Keep automatic_payment_methods as a fallback for other methods
       automatic_payment_methods: {
         enabled: true,
       },

@@ -131,7 +131,7 @@ export default function DonationStripeForm({
           try {
             const errorData = await response.json();
             errorDetails = errorData.message || errorData.error || '';
-          } catch(e) {
+          } catch {
             errorDetails = await response.text();
           }
           

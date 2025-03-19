@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { PaymentElement, useStripe, useElements, Elements } from '@stripe/react-stripe-js';
 import { toast } from 'react-hot-toast';
-import { createPaymentIntent, testApiConnection } from '../lib/stripe';
+import { createPaymentIntent, testApiConnection, stripePromise } from '../lib/stripe';
 import { CheckCircle } from 'lucide-react';
 
 interface StripePaymentFormProps {
@@ -12,23 +12,25 @@ interface StripePaymentFormProps {
   onProcessingChange?: (isProcessing: boolean) => void;
 }
 
-const CARD_ELEMENT_OPTIONS = {
-  style: {
-    base: {
-      color: '#32325d',
-      fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-      fontSmoothing: 'antialiased',
-      fontSize: '16px',
-      '::placeholder': {
-        color: '#aab7c4',
-      },
-    },
-    invalid: {
-      color: '#fa755a',
-      iconColor: '#fa755a',
-    },
-  },
-};
+// Payment form skeleton
+function PaymentFormSkeleton() {
+  return (
+    <div className="animate-pulse space-y-4">
+      {/* Header skeleton */}
+      <div className="w-full h-10 bg-gray-200 rounded-lg"></div>
+      
+      {/* Payment form fields skeleton */}
+      <div className="p-4 border border-gray-200 rounded-lg space-y-3">
+        <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+        <div className="h-10 bg-gray-200 rounded"></div>
+        <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+      </div>
+      
+      {/* Button skeleton */}
+      <div className="h-12 bg-gray-200 rounded-lg"></div>
+    </div>
+  );
+}
 
 // Prevent duplicate payment intents
 function useDebounce<T>(value: T, delay: number): T {
@@ -47,6 +49,131 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
+// Component for rendering the BLIK/Payment Element with its own Elements instance
+function BlikPaymentElementWrapper({ 
+  amount, 
+  currency, 
+  onPaymentSuccess, 
+  onPaymentError, 
+  onProcessingChange 
+}: {
+  amount: number;
+  currency: string;
+  onPaymentSuccess: (paymentIntentId: string) => void;
+  onPaymentError: (error: string) => void;
+  onProcessingChange?: (isProcessing: boolean) => void;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!stripe || !elements) {
+      toast.error('Payment system is not ready yet');
+      return;
+    }
+
+    // Set processing state
+    setIsProcessing(true);
+    setPaymentStatus('processing');
+    if (onProcessingChange) {
+      onProcessingChange(true);
+    }
+
+    try {
+      // For PaymentElement (which handles BLIK and other methods)
+      console.log('Confirming payment with Payment Element...');
+      const result = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: window.location.origin + '/payment/success',
+        },
+        redirect: 'if_required',
+      });
+
+      const { error, paymentIntent } = result;
+
+      if (error) {
+        throw new Error(error.message || 'Payment failed');
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        console.log('Payment successful!', paymentIntent.id);
+        toast.success('Payment successful!');
+        
+        // Set payment success state
+        setPaymentStatus('success');
+        
+        // Notify parent component
+        onPaymentSuccess(paymentIntent.id);
+      } else if (paymentIntent && paymentIntent.next_action) {
+        // Handle next actions that may be required for BLIK
+        console.log('Payment requires additional action:', paymentIntent.next_action);
+        // The UI for this is handled by Stripe.js
+      } else {
+        throw new Error(`Payment status: ${paymentIntent ? paymentIntent.status : 'unknown'}`);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Payment failed';
+      console.error('Payment error:', errorMessage);
+      setPaymentStatus('error');
+      onPaymentError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsProcessing(false);
+      if (onProcessingChange) {
+        onProcessingChange(false);
+      }
+    }
+  };
+
+  // Show success UI instead of the form when payment is successful
+  if (paymentStatus === 'success') {
+    return (
+      <div className="stripe-payment-success p-6 text-center">
+        <div className="mb-4 flex justify-center">
+          <CheckCircle className="h-12 w-12 text-green-500" />
+        </div>
+        <h3 className="text-xl font-medium text-gray-900 mb-2">Payment Successful!</h3>
+        <p className="text-gray-600 mb-4">
+          Thank you for your payment of {(amount / 100).toFixed(2)} {currency}
+        </p>
+        <p className="text-sm text-gray-500">
+          Redirecting you back to the profile...
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="p-4 border border-gray-300 rounded-lg">
+        <PaymentElement 
+          options={{
+            paymentMethodOrder: ['blik', 'card'],
+            business: {
+              name: 'Impact Market'
+            }
+          }} 
+        />
+      </div>
+      
+      <button
+        type="submit"
+        disabled={!stripe || isProcessing}
+        className={`w-full py-3 px-4 rounded-lg font-medium text-white ${
+          isProcessing || !stripe
+            ? 'bg-gray-400 cursor-not-allowed' 
+            : 'bg-green-600 hover:bg-green-700'
+        }`}
+      >
+        {isProcessing ? 'Processing...' : `Pay ${(amount / 100).toFixed(2)} ${currency}`}
+      </button>
+    </form>
+  );
+}
+
 export default function StripePaymentForm({ 
   amount, 
   currency,
@@ -54,8 +181,6 @@ export default function StripePaymentForm({
   onPaymentError,
   onProcessingChange
 }: StripePaymentFormProps) {
-  const stripe = useStripe();
-  const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -122,6 +247,7 @@ export default function StripePaymentForm({
       }
       
       console.log(`Creating payment intent for amount: ${debouncedAmount}`);
+      // Add payment_method_types to include BLIK
       const result = await createPaymentIntent(debouncedAmount, currency);
       
       if (result.error) {
@@ -164,77 +290,20 @@ export default function StripePaymentForm({
     };
   }, [debouncedAmount, apiStatus, clientSecret, createIntent]);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    if (!stripe || !elements || !clientSecret) {
-      toast.error('Payment system is not ready yet');
-      return;
-    }
-
-    // Set processing state
-    setIsProcessing(true);
-    setPaymentStatus('processing');
-    if (onProcessingChange) {
-      onProcessingChange(true);
-    }
-
-    try {
-      // Get card element
-      const cardElement = elements.getElement(CardElement);
-      if (!cardElement) {
-        throw new Error('Card element not found');
-      }
-
-      console.log('Confirming card payment...');
-      // Confirm payment with card element
-      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: cardElement,
-        },
-      });
-
-      if (error) {
-        throw new Error(error.message || 'Payment failed');
-      } else if (paymentIntent.status === 'succeeded') {
-        console.log('Payment successful!', paymentIntent.id);
-        toast.success('Payment successful!');
-        
-        // Set payment success state
-        setPaymentStatus('success');
-        
-        // Notify parent component
-        onPaymentSuccess(paymentIntent.id);
-        
-        // Clear form and reset state after 2 seconds to allow time to see success message
-        setTimeout(() => {
-          if (elements.getElement(CardElement)) {
-            elements.getElement(CardElement)?.clear();
-          }
-        }, 2000);
-      } else {
-        throw new Error(`Payment status: ${paymentIntent.status}`);
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Payment failed';
-      console.error('Payment error:', errorMessage);
-      setPaymentError(errorMessage);
-      setPaymentStatus('error');
-      onPaymentError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsProcessing(false);
-      if (onProcessingChange) {
-        onProcessingChange(false);
-      }
-    }
-  };
-
   if (apiStatus === 'checking') {
     return (
-      <div className="stripe-payment-form">
-        <div className="p-4 bg-gray-100 rounded text-center">
-          <p>Connecting to payment service...</p>
+      <div className="stripe-payment-form p-4 border border-gray-100 rounded-lg">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="h-5 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+            <div className="h-5 bg-gray-200 rounded w-1/4 animate-pulse"></div>
+          </div>
+          
+          <PaymentFormSkeleton />
+          
+          <div className="text-center text-sm text-gray-500 mt-2">
+            Connecting to payment service...
+          </div>
         </div>
       </div>
     );
@@ -277,29 +346,37 @@ export default function StripePaymentForm({
           </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="p-4 border border-gray-300 rounded-lg">
-            <CardElement options={CARD_ELEMENT_OPTIONS} />
+        <>
+          {/* Payment method header */}
+          <div className="mb-4">
+            <div className="w-full">
+              <div 
+                className="py-2 px-3 text-center rounded-lg border border-green-500 bg-green-50 text-green-700 font-medium"
+              >
+                Płać wygodnie z naszymi partnerami
+              </div>
+            </div>
           </div>
-          
-          <button
-            type="submit"
-            disabled={!stripe || !clientSecret || isProcessing}
-            className={`w-full py-3 px-4 rounded-lg font-medium text-white ${
-              isProcessing || !stripe || !clientSecret 
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-green-600 hover:bg-green-700'
-            }`}
-          >
-            {isProcessing ? 'Processing...' : `Pay ${(amount / 100).toFixed(2)} ${currency}`}
-          </button>
-          
-          {clientSecret && (
-            <div className="text-xs text-gray-500 text-center mt-2">
-              Payment ready for processing
+
+          {clientSecret ? (
+            <Elements stripe={stripePromise} options={{ clientSecret }}>
+              <BlikPaymentElementWrapper
+                amount={amount}
+                currency={currency}
+                onPaymentSuccess={onPaymentSuccess}
+                onPaymentError={onPaymentError}
+                onProcessingChange={onProcessingChange}
+              />
+            </Elements>
+          ) : (
+            <div className="p-4 border border-gray-200 rounded-lg">
+              <PaymentFormSkeleton />
+              <div className="text-center text-sm text-gray-500 mt-4">
+                Preparing payment options...
+              </div>
             </div>
           )}
-        </form>
+        </>
       )}
     </div>
   );
