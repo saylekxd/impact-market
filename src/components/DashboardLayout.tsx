@@ -4,6 +4,7 @@ import Sidebar from '../pages/dashboard/components/Sidebar';
 import { useAuth } from '../contexts/AuthContext';
 import { auth } from '../lib/auth';
 import { toast } from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -28,16 +29,29 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row">
-          <div className="w-full md:w-64 mb-8 md:mb-0">
-            <Sidebar onLogout={handleLogout} />
-          </div>
-          <div className="flex-1 md:pl-8">
-            {children}
-          </div>
-        </div>
+    <div className="h-screen flex bg-[#dcddd7] text-[#FF8C3B]">
+      {/* Sidebar */}
+      <div className="w-64 shrink-0">
+        <motion.div 
+          className="h-full"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Sidebar onLogout={handleLogout} />
+        </motion.div>
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1 overflow-y-auto pt-2">
+        <motion.div 
+          className="p-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          {children}
+        </motion.div>
       </div>
     </div>
   );

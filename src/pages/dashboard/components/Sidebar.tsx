@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { UserCircle, Wallet, Settings, LogOut } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface SidebarProps {
   onLogout: () => void;
@@ -9,58 +10,61 @@ interface SidebarProps {
 export default function Sidebar({ onLogout }: SidebarProps) {
   const location = useLocation();
 
+  const menuItems = [
+    { name: 'Profil', icon: <UserCircle className="h-5 w-5" />, path: '/dashboard' },
+    { name: 'Finanse', icon: <Wallet className="h-5 w-5" />, path: '/dashboard/finances' },
+    { name: 'Ustawienia', icon: <Settings className="h-5 w-5" />, path: '/dashboard/settings' }
+  ];
+
   return (
-    <div className="w-64 bg-white shadow-lg">
-      <div className="h-full flex flex-col">
-        <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-          <div className="flex items-center flex-shrink-0 px-4">
-            <span className="text-xl font-semibold text-gray-800">Panel twórcy</span>
-          </div>
-          <nav className="mt-5 flex-1 px-2 space-y-1">
-            <Link
-              to="/dashboard"
-              className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/dashboard'
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
+    <div className="h-full bg-[rgb(26,26,26)] text-white rounded-r-xl overflow-hidden">
+      <div className="h-full flex flex-col p-5">
+        <motion.div 
+          className="flex items-center flex-shrink-0 mb-8 pl-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <span className="text-xl font-bold tracking-tight">Panel twórcy</span>
+        </motion.div>
+        
+        <nav className="flex-1 space-y-1">
+          {menuItems.map((item, index) => (
+            <motion.div
+              key={item.path}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
             >
-              <UserCircle className="mr-3 h-6 w-6" />
-              Profil
-            </Link>
-            <Link
-              to="/dashboard/finances"
-              className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/dashboard/finances'
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Wallet className="mr-3 h-6 w-6" />
-              Finanse
-            </Link>
-            <Link
-              to="/dashboard/settings"
-              className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/dashboard/settings'
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Settings className="mr-3 h-6 w-6" />
-              Ustawienia
-            </Link>
-          </nav>
-        </div>
-        <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
+              <Link
+                to={item.path}
+                className={`flex items-center px-4 py-3 rounded-lg transition-all duration-200 ${
+                  location.pathname === item.path
+                    ? 'bg-white/10 font-medium'
+                    : 'hover:bg-white/5'
+                }`}
+              >
+                <span className="mr-3">{item.icon}</span>
+                <span>{item.name}</span>
+              </Link>
+            </motion.div>
+          ))}
+        </nav>
+        
+        <motion.div 
+          className="flex-shrink-0 pt-4 mt-8 border-t border-white/10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
           <button
             onClick={onLogout}
-            className="flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
+            className="flex items-center px-4 py-3 rounded-lg w-full hover:bg-white/5 transition-all duration-200"
           >
-            <LogOut className="mr-3 h-6 w-6" />
-            Wyloguj się
+            <LogOut className="mr-3 h-5 w-5" />
+            <span>Wyloguj się</span>
           </button>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

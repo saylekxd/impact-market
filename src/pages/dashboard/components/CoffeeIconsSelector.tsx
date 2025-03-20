@@ -233,14 +233,14 @@ export default function CoffeeIconsSelector({ value, onChange }: CoffeeIconsSele
                 onClick={() => setSelectedTier(tier as 'small' | 'medium' | 'large')}
                 className={`py-4 px-6 font-medium text-sm border-b-2 relative ${
                   selectedTier === tier
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-[#FF8C3B] text-[#FF8C3B]'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 <span className="flex items-center">
                   {label}
                   {hasIconAssigned && selectedTier !== tier && (
-                    <span className="ml-2 h-2 w-2 bg-green-500 rounded-full"></span>
+                    <span className="ml-2 h-2 w-2 bg-[#FF8C3B] rounded-full"></span>
                   )}
                 </span>
                 
@@ -288,7 +288,7 @@ export default function CoffeeIconsSelector({ value, onChange }: CoffeeIconsSele
                   }
                   onChange(newValue);
                 }}
-                className="focus:ring-green-500 focus:border-green-500 block w-full pl-3 pr-8 sm:text-sm border-gray-300 rounded-md"
+                className="focus:ring-[#FF8C3B] focus:border-[#FF8C3B] block w-full pl-3 pr-8 sm:text-sm border-gray-300 rounded-md"
               />
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                 <span className="text-gray-500 sm:text-sm">PLN</span>
@@ -303,7 +303,7 @@ export default function CoffeeIconsSelector({ value, onChange }: CoffeeIconsSele
             {(() => {
               const IconComponent = getIconComponent(currentIconId);
               return IconComponent ? (
-                <IconComponent className="h-6 w-6 text-blue-500" />
+                <IconComponent className="h-6 w-6 text-[#FF8C3B]" />
               ) : (
                 <div className="h-6 w-6 bg-gray-200 rounded-full" />
               );
@@ -331,7 +331,7 @@ export default function CoffeeIconsSelector({ value, onChange }: CoffeeIconsSele
               onClick={() => setSelectedCategory(category.id)}
               className={`px-3 py-2 text-sm rounded-md flex items-center space-x-1 ${
                 selectedCategory === category.id
-                  ? 'bg-blue-100 text-blue-800'
+                  ? 'bg-[#FF8C3B]/10 text-[#FF8C3B]'
                   : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
             >
@@ -381,28 +381,28 @@ export default function CoffeeIconsSelector({ value, onChange }: CoffeeIconsSele
                       )}
                       className={`relative flex items-center p-3 rounded-lg border ${
                         isSelected 
-                          ? 'border-blue-500 bg-blue-51' 
+                          ? 'border-[#FF8C3B] bg-[#FF8C3B]/10' 
                           : isRecommendedForTier
-                            ? 'border-blue-200 bg-blue-50/30'
+                            ? 'border-[#FF8C3B]/30 bg-[#FF8C3B]/5'
                             : (showSmallBadge || showMediumBadge || showLargeBadge)
                               ? 'border-gray-300 bg-gray-50'
-                              : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50/30'
+                              : 'border-gray-200 hover:border-[#FF8C3B]/30 hover:bg-[#FF8C3B]/5'
                       }`}
                     >
                       <div className="mr-3">
                         <IconComponent className={`h-5 w-5 ${
                           isSelected 
-                            ? 'text-blue-500' 
+                            ? 'text-[#FF8C3B]' 
                             : isRecommendedForTier 
-                              ? 'text-blue-400' 
+                              ? 'text-[#FF8C3B]/70' 
                               : 'text-gray-400'
                         }`} />
                       </div>
                       <span className={`text-sm ${
                         isSelected 
-                          ? 'text-blue-700 font-medium' 
+                          ? 'text-[#FF8C3B] font-medium' 
                           : isRecommendedForTier 
-                            ? 'text-blue-600' 
+                            ? 'text-[#FF8C3B]/80' 
                             : 'text-gray-600'
                       }`}>
                         {iconItem.label}
@@ -410,15 +410,15 @@ export default function CoffeeIconsSelector({ value, onChange }: CoffeeIconsSele
                       
                       {/* Recommended tier indicator */}
                       {isRecommendedForTier && !isSelected && (
-                        <div className="absolute -top-1 -right-1 h-4 w-4 bg-blue-100 rounded-full flex items-center justify-center">
-                          <div className="h-2 w-2 bg-blue-400 rounded-full"></div>
+                        <div className="absolute -top-1 -right-1 h-4 w-4 bg-[#FF8C3B]/10 rounded-full flex items-center justify-center">
+                          <div className="h-2 w-2 bg-[#FF8C3B]/70 rounded-full"></div>
                         </div>
                       )}
                       
                       {/* Selection indicator */}
                       {isSelected && !showSmallBadge && !showMediumBadge && !showLargeBadge && (
                         <div className="absolute top-1 right-1">
-                          <Check className="h-4 w-4 text-green-500" />
+                          <Check className="h-4 w-4 text-[#FF8C3B]" />
                         </div>
                       )}
                       
@@ -426,17 +426,17 @@ export default function CoffeeIconsSelector({ value, onChange }: CoffeeIconsSele
                       {(showSmallBadge || showMediumBadge || showLargeBadge) && (
                         <div className="absolute top-1 right-1 flex gap-1">
                           {showSmallBadge && (
-                            <div className="h-4 w-4 bg-green-100 text-green-800 rounded-full flex items-center justify-center text-[8px] font-bold">
+                            <div className="h-4 w-4 bg-[#FF8C3B]/10 text-[#FF8C3B] rounded-full flex items-center justify-center text-[8px] font-bold">
                               S
                             </div>
                           )}
                           {showMediumBadge && (
-                            <div className="h-4 w-4 bg-yellow-100 text-yellow-800 rounded-full flex items-center justify-center text-[8px] font-bold">
+                            <div className="h-4 w-4 bg-[#FF8C3B]/10 text-[#FF8C3B] rounded-full flex items-center justify-center text-[8px] font-bold">
                               M
                             </div>
                           )}
                           {showLargeBadge && (
-                            <div className="h-4 w-4 bg-red-100 text-red-800 rounded-full flex items-center justify-center text-[8px] font-bold">
+                            <div className="h-4 w-4 bg-[#FF8C3B]/10 text-[#FF8C3B] rounded-full flex items-center justify-center text-[8px] font-bold">
                               L
                             </div>
                           )}

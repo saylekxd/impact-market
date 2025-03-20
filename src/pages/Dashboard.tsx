@@ -9,6 +9,7 @@ import { TrendingUp, Users, CreditCard, Calendar, ArrowUpRight, ArrowDownRight }
 import DashboardLayout from '../components/DashboardLayout';
 import ProfileForm from './dashboard/components/ProfileForm';
 import ProfileSection from './dashboard/components/ProfileSection';
+import { motion } from 'framer-motion';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -150,8 +151,10 @@ export default function Dashboard() {
   if (loading || paymentsLoading) {
     return (
       <DashboardLayout>
-        <div className="text-center">
-          <p className="text-xl text-gray-600">Ładowanie...</p>
+        <div className="flex justify-center items-center h-64">
+          <div className="relative">
+            <div className="h-12 w-12 rounded-full border-2 border-black border-t-transparent animate-spin"></div>
+          </div>
         </div>
       </DashboardLayout>
     );
@@ -159,124 +162,71 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div>
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Panel twórcy</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Witaj, {profile?.display_name}! Oto przegląd Twojego profilu i wsparcia.
+      <div className="space-y-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-6"
+        >
+          <h1 className="text-2xl font-bold text-black">Panel twórcy</h1>
+          <p className="mt-1 text-gray-500">
+            Witaj, {profile?.username || ''}! Oto przegląd Twojego profilu i wsparcia.
           </p>
-        </div>
+        </motion.div>
 
         {/* Statystyki */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <TrendingUp className="h-6 w-6 text-gray-400" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Łączne wsparcie
-                    </dt>
-                    <dd className="flex items-baseline">
-                      <div className="text-2xl font-semibold text-gray-900">
-                        {(stats.totalAmount / 100).toFixed(2)} PLN
-                      </div>
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Users className="h-6 w-6 text-gray-400" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Liczba wspierających
-                    </dt>
-                    <dd className="flex items-baseline">
-                      <div className="text-2xl font-semibold text-gray-900">
-                        {stats.donorsCount}
-                      </div>
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <CreditCard className="h-6 w-6 text-gray-400" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Ostatni miesiąc
-                    </dt>
-                    <dd className="flex items-baseline">
-                      <div className="text-2xl font-semibold text-gray-900">
-                        {(stats.lastMonthAmount / 100).toFixed(2)} PLN
-                      </div>
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Calendar className="h-6 w-6 text-gray-400" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Wzrost miesięczny
-                    </dt>
-                    <dd className="flex items-baseline">
-                      <div className="text-2xl font-semibold text-gray-900">
-                        {stats.monthlyGrowth.toFixed(1)}%
-                      </div>
-                      <div className={`ml-2 flex items-baseline text-sm font-semibold ${
-                        stats.monthlyGrowth >= 0 ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {stats.monthlyGrowth >= 0 ? (
-                          <ArrowUpRight className="self-center flex-shrink-0 h-4 w-4" />
-                        ) : (
-                          <ArrowDownRight className="self-center flex-shrink-0 h-4 w-4" />
-                        )}
-                      </div>
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        >
+          <StatCard 
+            icon={<TrendingUp className="h-6 w-6" />}
+            title="Łączne wsparcie"
+            value={`${(stats.totalAmount / 100).toFixed(2)} PLN`}
+            delay={0}
+          />
+          
+          <StatCard 
+            icon={<Users className="h-6 w-6" />}
+            title="Liczba wspierających"
+            value={stats.donorsCount.toString()}
+            delay={0.1}
+          />
+          
+          <StatCard 
+            icon={<CreditCard className="h-6 w-6" />}
+            title="Ostatni miesiąc"
+            value={`${(stats.lastMonthAmount / 100).toFixed(2)} PLN`}
+            delay={0.2}
+          />
+          
+          <StatCard 
+            icon={<Calendar className="h-6 w-6" />}
+            title="Wzrost miesięczny"
+            value={`${stats.monthlyGrowth.toFixed(1)}%`}
+            indicator={stats.monthlyGrowth >= 0 ? 'up' : 'down'}
+            delay={0.3}
+          />
+        </motion.div>
 
         {/* Profil */}
-        <div className="bg-white shadow rounded-lg overflow-hidden mb-8">
-          <div className="px-6 py-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="bg-white rounded-xl shadow-sm overflow-hidden"
+        >
+          <div className="p-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold text-gray-900">Twój profil</h2>
+              <h2 className="text-xl font-bold tracking-tight text-black">Twój profil</h2>
               <button
                 onClick={() => setEditing(!editing)}
-                className="text-blue-600 hover:text-blue-500"
+                className="px-4 py-2 rounded-lg bg-black text-white hover:bg-black/80 transition-colors"
               >
-                {editing ? 'Anuluj' : 'Edytuj'}
+                {editing ? 'Anuluj' : 'Edytuj profil'}
               </button>
             </div>
 
@@ -289,19 +239,23 @@ export default function Dashboard() {
             ) : (
               <ProfileSection 
                 onEdit={() => setEditing(true)}
-                editing={editing}
               />
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* Historia wpłat */}
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <div className="px-6 py-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Historia wpłat</h2>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="bg-white rounded-xl shadow-sm overflow-hidden"
+        >
+          <div className="p-6">
+            <h2 className="text-xl font-bold tracking-tight text-black mb-6">Historia wpłat</h2>
             {payments.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-500">Brak wpłat</p>
+                <p className="text-gray-500 font-medium">Brak wpłat</p>
                 <p className="text-sm text-gray-400 mt-2">
                   Udostępnij swój profil, aby zacząć otrzymywać wsparcie
                 </p>
@@ -311,27 +265,32 @@ export default function Dashboard() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead>
                     <tr>
-                      <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Data
                       </th>
-                      <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Kwota
                       </th>
-                      <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Od
                       </th>
-                      <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Wiadomość
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {payments.map((payment) => (
-                      <tr key={payment.id}>
+                  <tbody className="divide-y divide-gray-200">
+                    {payments.map((payment, index) => (
+                      <motion.tr 
+                        key={payment.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.1 + (index * 0.05) }}
+                      >
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {new Date(payment.created_at).toLocaleDateString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {(payment.amount / 100).toFixed(2)} PLN
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -340,15 +299,62 @@ export default function Dashboard() {
                         <td className="px-6 py-4 text-sm text-gray-500">
                           {payment.message || '-'}
                         </td>
-                      </tr>
+                      </motion.tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </DashboardLayout>
   );
 }
+
+// StatCard component for the dashboard statistics
+type StatCardProps = {
+  icon: React.ReactNode;
+  title: string;
+  value: string;
+  indicator?: 'up' | 'down';
+  delay?: number;
+};
+
+const StatCard: React.FC<StatCardProps> = ({ icon, title, value, indicator, delay = 0 }) => {
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay }}
+      className="bg-white rounded-xl shadow-sm overflow-hidden p-5"
+    >
+      <div className="flex items-center">
+        <div className="flex-shrink-0 text-gray-500">
+          {icon}
+        </div>
+        <div className="ml-4 w-0 flex-1">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+            {title}
+          </p>
+          <div className="flex items-baseline">
+            <p className="text-2xl font-bold tracking-tight text-black">
+              {value}
+            </p>
+            {indicator && (
+              <span className={`ml-2 flex items-center text-sm font-medium ${
+                indicator === 'up' ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {indicator === 'up' ? (
+                  <ArrowUpRight className="h-4 w-4" />
+                ) : (
+                  <ArrowDownRight className="h-4 w-4" />
+                )}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};

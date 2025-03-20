@@ -2,7 +2,6 @@ import { useScreenSize } from "@/components/hooks/use-screen-size"
 import { PixelTrail } from "@/components/ui/pixel-trail"
 import { AnimatedBackground } from "@/components/ui/animated-background"
 import { MinimalFooter } from "@/components/ui/minimal-footer"
-import { MinimalHeader } from "@/components/ui/minimal-header"
 import { useRef, useEffect } from "react"
 import { motion } from "framer-motion"
 
@@ -44,7 +43,6 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <MinimalHeader />
       <div className="snap-y snap-mandatory h-screen overflow-y-auto">
         <div className="relative w-full h-screen bg-[#dcddd7] text-black flex flex-col snap-start">
           <div className="absolute inset-0 z-0">
