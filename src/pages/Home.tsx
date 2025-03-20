@@ -1,91 +1,179 @@
-import { Link } from 'react-router-dom';
-import PageLayout from '../components/PageLayout';
+import { useScreenSize } from "@/components/hooks/use-screen-size"
+import { PixelTrail } from "@/components/ui/pixel-trail"
+import { AnimatedBackground } from "@/components/ui/animated-background"
+import { MinimalFooter } from "@/components/ui/minimal-footer"
+import { MinimalHeader } from "@/components/ui/minimal-header"
+import { useRef, useEffect } from "react"
+import { motion } from "framer-motion"
 
-export default function Home() {
+const Home: React.FC = () => {
+  const screenSize = useScreenSize()
+  const secondSectionRef = useRef<HTMLDivElement>(null)
+  const thirdSectionRef = useRef<HTMLDivElement>(null)
+
+  const scrollToSecond = () => {
+    secondSectionRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  const scrollToThird = () => {
+    thirdSectionRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("opacity-100")
+            entry.target.classList.remove("opacity-0", "translate-y-10")
+          }
+        })
+      },
+      { threshold: 0.1 }
+    )
+
+    if (secondSectionRef.current) {
+      observer.observe(secondSectionRef.current)
+    }
+    if (thirdSectionRef.current) {
+      observer.observe(thirdSectionRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <PageLayout>
-      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          
-          
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl transform transition-all duration-300 hover:shadow-[#FF9F2D]/10">
-            <h2 className="text-2xl md:text-3xl font-semibold text-white mb-4">
-            Nowa era dobroczynności cyfrowej
-            </h2>
-            <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
-            Tworzymy innowacyjny marketplace, gdzie każda transakcja zamienia się w realną pomoc. Kupując wirtualne dobra, wspierasz ludzi i organizacje, które zmieniają świat na lepsze.
-            </p>
-            
-            {/* Progress Bar */}
-            <div className="max-w-md mx-auto mb-6">
-              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                <div className="h-full bg-[#FF9F2D] rounded-full w-3/4 animate-pulse"></div>
-              </div>
-              <p className="text-gray-400 text-sm mt-2">
-                Postęp prac: 75%
-              </p>
-            </div>
-
-       
-            
-            <p className="text-gray-300 mb-6">
-              Zapisz się do newslettera, aby otrzymywać informacje o postępach prac i dacie startu platformy.
-            </p>
-            <form className="flex flex-col sm:flex-row gap-4 justify-center">
-              <input
-                type="email"
-                placeholder="Twój adres email"
-                className="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF9F2D] focus:border-transparent"
-              />
-              <button
-                type="submit"
-                className="px-6 py-2 rounded-full bg-[#FF9F2D] text-white font-medium hover:bg-[#f39729] transition-all duration-200 transform hover:scale-105"
-              >
-                Zapisz się
-              </button>
-            </form>
-        
-           
+    <>
+      <MinimalHeader />
+      <div className="snap-y snap-mandatory h-screen overflow-y-auto">
+        <div className="relative w-full h-screen bg-[#dcddd7] text-black flex flex-col snap-start">
+          <div className="absolute inset-0 z-0">
+            <PixelTrail
+              pixelSize={screenSize.lessThan("md") ? 48 : 80}
+              fadeDuration={0}
+              delay={1200}
+              pixelClassName="rounded-full bg-[#ffa04f]"
+            />
           </div>
+
+          <div className="justify-center items-center flex flex-col w-full h-full z-10 pointer-events-none space-y-2 md:space-y-8">
+            <h2 className="text-3xl cursor-pointer sm:text-5xl md:text-7xl tracking-tight">
+              fancy ✽ components{" "}
+            </h2>
+            <p className="text-xs md:text-2xl">
+              with react, motion, and typescript.
+            </p>
+          </div>
+
+          <motion.button
+            onClick={scrollToSecond}
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-black cursor-pointer z-20 pointer-events-auto"
+            animate={{
+              y: [0, 10, 0],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 5v14M19 12l-7 7-7-7" />
+            </svg>
+          </motion.button>
+
+          <p className="absolute text-xs md:text-base bottom-4 right-4 pointer-events-none">
+            make the web fun again.
+          </p>
         </div>
 
-       
-    
+        <div
+          ref={secondSectionRef}
+          className="relative w-full h-screen bg-[#1a1a1a] text-white flex flex-col snap-start transition-all duration-1000 opacity-0 translate-y-10"
+        >
+          <motion.div
+            className="absolute top-8 right-8 w-3 h-3 md:w-4 md:h-4 rounded-full bg-[rgb(255,160,79)]"
+            animate={{
+              scale: [1, 1.5, 1],
+              opacity: [0.4, 1, 0.4],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
 
-    
-
-        {/* Footer */}
-        <footer className="mt-20 text-center text-gray-400">
-          <div className="flex justify-center space-x-6 mb-4">
-            <Link to="/about" className="hover:text-[#FF9F2D] transition-colors duration-200">O nas</Link>
-            <Link to="/privacy" className="hover:text-[#FF9F2D] transition-colors duration-200">Polityka prywatności</Link>
-            <Link to="/terms" className="hover:text-[#FF9F2D] transition-colors duration-200">Regulamin</Link>
+          <div className="justify-center items-center flex flex-col w-full h-full z-10 pointer-events-none space-y-4 md:space-y-12">
+            <h2 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tighter">
+              Second Screen
+            </h2>
+            <p className="text-sm md:text-xl text-gray-400 max-w-md text-center px-4">
+              Minimalistic design with a subtle accent.
+            </p>
           </div>
 
-          <p>© {new Date().getFullYear()} Impact Market. Wszystkie prawa zastrzeżone.</p>
-          
-          {/* Added developer info */}
-          <div className="flex items-center justify-center gap-2 mt-4">
-            <span className="text-[0.9rem] h-[1.5rem] flex items-center">Developed by</span>
-            <a 
-              href="https://swtlabs.pl" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="hover:scale-105 transition-transform duration-200"
+          <motion.button
+            onClick={scrollToThird}
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white cursor-pointer z-20 pointer-events-auto"
+            animate={{
+              y: [0, 10, 0],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              <img 
-                src="/swtlabs-logo.png" 
-                alt="SWTLabs Logo" 
-                className="max-w-[2rem] sm:max-w-[3rem] md:max-w-[4rem] w-auto h-auto transition-all"
-                style={{ aspectRatio: '140/45' }} // Actual logo aspect ratio (replace with your logo's ratio)
-              />
-            </a>
+              <path d="M12 5v14M19 12l-7 7-7-7" />
+            </svg>
+          </motion.button>
+        </div>
+
+        <div
+          ref={thirdSectionRef}
+          className="relative w-full min-h-[250vh] bg-[#dcddd7] text-black flex flex-col snap-start transition-all duration-1000 opacity-0 translate-y-10 overflow-hidden"
+        >
+          <AnimatedBackground className="absolute inset-0 z-0 opacity-50" />
+
+          <div className="sticky top-0 justify-center items-center flex flex-col w-full h-screen z-10 pointer-events-none space-y-4 md:space-y-12 pt-16">
+            <h2 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tight">
+              Third Screen
+            </h2>
+            <p className="text-sm md:text-xl max-w-md text-center px-4">
+              Featuring an automatically animated background pattern.
+            </p>
           </div>
 
-      
-        </footer>
+          <div className="relative w-full flex-1 flex flex-col justify-end">
+            <div className="relative w-full h-[100vh] bg-gradient-to-b from-[#dcddd7] via-[#dcddd7] to-[#1a1a1a]" />
+            <MinimalFooter />
+          </div>
+        </div>
       </div>
-    </PageLayout>
-  );
+    </>
+  )
 }
+
+export default Home
