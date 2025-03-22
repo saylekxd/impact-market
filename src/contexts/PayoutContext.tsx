@@ -2,7 +2,16 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabase';
 import { toast } from 'react-hot-toast';
-import type { BankAccount, Payout } from '../lib/database.types';
+import type { Database } from '../lib/database.types';
+
+// Define types from the Database interface
+type BankAccount = Database['public']['Tables']['bank_accounts']['Row'];
+type Payout = Database['public']['Tables']['payouts']['Row'] & {
+  bank_accounts?: {
+    account_number: string;
+    bank_name: string;
+  };
+};
 
 interface PayoutContextType {
   bankAccount: BankAccount | null;
@@ -11,7 +20,7 @@ interface PayoutContextType {
   loadBankAccount: () => Promise<void>;
   loadPayouts: () => Promise<void>;
   saveBankAccount: (data: Partial<BankAccount>) => Promise<boolean>;
-  requestPayout: (amount: number) => Promise<boolean>;
+  requestPayout: (amount: number, bankAccountId?: string) => Promise<boolean>;
 }
 
 const PayoutContext = createContext<PayoutContextType>({
@@ -39,9 +48,18 @@ export function PayoutProvider({ children }: { children: React.ReactNode }) {
         .from('bank_accounts')
         .select('*')
         .eq('user_id', user.id)
-        .maybeSingle();
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === 'PGRST116') {
+          setBankAccount(null);
+          return;
+        }
+        throw error;
+      }
+      
       setBankAccount(data);
     } catch (error) {
       console.error('Error loading bank account:', error);
@@ -81,19 +99,35 @@ export function PayoutProvider({ children }: { children: React.ReactNode }) {
     if (!user) return false;
 
     try {
-      const { data: savedAccount, error } = await supabase
-        .from('bank_accounts')
-        .upsert({
-          user_id: user.id,
-          ...data,
-          updated_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
+      if (bankAccount) {
+        const { data: updatedAccount, error } = await supabase
+          .from('bank_accounts')
+          .update({
+            ...data,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', bankAccount.id)
+          .select()
+          .single();
 
-      if (error) throw error;
+        if (error) throw error;
+        setBankAccount(updatedAccount);
+      } else {
+        const { data: newAccount, error } = await supabase
+          .from('bank_accounts')
+          .insert({
+            user_id: user.id,
+            ...data,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select()
+          .single();
 
-      setBankAccount(savedAccount);
+        if (error) throw error;
+        setBankAccount(newAccount);
+      }
+
       toast.success('Dane bankowe zostały zapisane');
       return true;
     } catch (error) {
@@ -101,10 +135,18 @@ export function PayoutProvider({ children }: { children: React.ReactNode }) {
       toast.error('Nie udało się zapisać danych bankowych');
       return false;
     }
-  }, [user]);
+  }, [user, bankAccount]);
 
-  const requestPayout = useCallback(async (amount: number): Promise<boolean> => {
-    if (!user || !bankAccount) return false;
+  const requestPayout = useCallback(async (amount: number, bankAccountId?: string): Promise<boolean> => {
+    if (!user) return false;
+
+    // If no specific bank account ID is provided, use the default one
+    const effectiveBankAccountId = bankAccountId || bankAccount?.id;
+    
+    if (!effectiveBankAccountId) {
+      toast.error('Brak danych konta bankowego');
+      return false;
+    }
 
     try {
       const { error } = await supabase
@@ -112,7 +154,7 @@ export function PayoutProvider({ children }: { children: React.ReactNode }) {
         .insert({
           user_id: user.id,
           amount,
-          bank_account_id: bankAccount.id,
+          bank_account_id: effectiveBankAccountId,
           status: 'pending',
         });
 

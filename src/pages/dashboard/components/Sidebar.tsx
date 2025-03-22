@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { UserCircle, Wallet, Settings, LogOut } from 'lucide-react';
+import { UserCircle, Wallet, Settings, LogOut, Image, Heart, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface SidebarProps {
@@ -12,7 +12,10 @@ export default function Sidebar({ onLogout }: SidebarProps) {
 
   const menuItems = [
     { name: 'Profil', icon: <UserCircle className="h-5 w-5" />, path: '/dashboard' },
-    { name: 'Finanse', icon: <Wallet className="h-5 w-5" />, path: '/dashboard/finances' },
+    { name: 'Ikony', icon: <Image className="h-5 w-5" />, path: '/dashboard/icons' },
+    { name: 'Wypłaty', icon: <Wallet className="h-5 w-5" />, path: '/dashboard/withdraws' },
+    { name: 'Darowizny', icon: <Heart className="h-5 w-5" />, path: '/dashboard/donations' },
+    { name: 'Dokumenty', icon: <FileText className="h-5 w-5" />, path: '/dashboard/documents' },
     { name: 'Ustawienia', icon: <Settings className="h-5 w-5" />, path: '/dashboard/settings' }
   ];
 

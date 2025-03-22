@@ -9,6 +9,8 @@ import { TrendingUp, Users, CreditCard, Calendar, ArrowUpRight, ArrowDownRight }
 import DashboardLayout from '../components/DashboardLayout';
 import ProfileForm from './dashboard/components/ProfileForm';
 import ProfileSection from './dashboard/components/ProfileSection';
+import ProfileHeader from './dashboard/components/ProfileHeader';
+import ProfileStatistics from './dashboard/components/ProfileStatistics';
 import { motion } from 'framer-motion';
 
 export default function Dashboard() {
@@ -34,6 +36,7 @@ export default function Dashboard() {
     small_icon: 'coffee',
     medium_icon: 'coffee',
     large_icon: 'coffee',
+    social_links: {},
   });
 
   useEffect(() => {
@@ -62,6 +65,7 @@ export default function Dashboard() {
             small_icon: profileResult.data?.small_icon || 'coffee',
             medium_icon: profileResult.data?.medium_icon || 'coffee',
             large_icon: profileResult.data?.large_icon || 'coffee',
+            social_links: profileResult.data?.social_links || {},
           });
         }
 
@@ -118,6 +122,7 @@ export default function Dashboard() {
         small_icon: formData.small_icon,
         medium_icon: formData.medium_icon,
         large_icon: formData.large_icon,
+        social_links: formData.social_links,
       };
       
       const result = await profiles.update(user.id, updatedProfileData);
@@ -138,6 +143,7 @@ export default function Dashboard() {
           small_icon: result.data.small_icon || 'coffee',
           medium_icon: result.data.medium_icon || 'coffee',
           large_icon: result.data.large_icon || 'coffee',
+          social_links: result.data.social_links || {},
         });
       } else {
         throw new Error(result.error);
@@ -175,41 +181,13 @@ export default function Dashboard() {
           </p>
         </motion.div>
 
-        {/* Statystyki */}
+        {/* ProfileStatistics - New component */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
         >
-          <StatCard 
-            icon={<TrendingUp className="h-6 w-6" />}
-            title="Łączne wsparcie"
-            value={`${(stats.totalAmount / 100).toFixed(2)} PLN`}
-            delay={0}
-          />
-          
-          <StatCard 
-            icon={<Users className="h-6 w-6" />}
-            title="Liczba wspierających"
-            value={stats.donorsCount.toString()}
-            delay={0.1}
-          />
-          
-          <StatCard 
-            icon={<CreditCard className="h-6 w-6" />}
-            title="Ostatni miesiąc"
-            value={`${(stats.lastMonthAmount / 100).toFixed(2)} PLN`}
-            delay={0.2}
-          />
-          
-          <StatCard 
-            icon={<Calendar className="h-6 w-6" />}
-            title="Wzrost miesięczny"
-            value={`${stats.monthlyGrowth.toFixed(1)}%`}
-            indicator={stats.monthlyGrowth >= 0 ? 'up' : 'down'}
-            delay={0.3}
-          />
+          <ProfileStatistics />
         </motion.div>
 
         {/* Profil */}
@@ -217,30 +195,33 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-white rounded-xl shadow-sm overflow-hidden"
         >
-          <div className="p-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold tracking-tight text-black">Twój profil</h2>
-              <button
-                onClick={() => setEditing(!editing)}
-                className="px-4 py-2 rounded-lg bg-black text-white hover:bg-black/80 transition-colors"
-              >
-                {editing ? 'Anuluj' : 'Edytuj profil'}
-              </button>
-            </div>
+          <ProfileHeader onEditClick={() => setEditing(true)} />
+          
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="p-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold tracking-tight text-black">Twój profil</h2>
+                <button
+                  onClick={() => setEditing(!editing)}
+                  className="px-4 py-2 rounded-lg bg-black text-white hover:bg-black/80 transition-colors"
+                >
+                  {editing ? 'Anuluj' : 'Edytuj profil'}
+                </button>
+              </div>
 
-            {editing ? (
-              <ProfileForm 
-                formData={formData}
-                onChange={setFormData}
-                onSubmit={handleUpdateProfile}
-              />
-            ) : (
-              <ProfileSection 
-                onEdit={() => setEditing(true)}
-              />
-            )}
+              {editing ? (
+                <ProfileForm 
+                  formData={formData}
+                  onChange={setFormData}
+                  onSubmit={handleUpdateProfile}
+                />
+              ) : (
+                <ProfileSection 
+                  onEdit={() => setEditing(true)}
+                />
+              )}
+            </div>
           </div>
         </motion.div>
 

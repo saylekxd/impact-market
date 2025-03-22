@@ -98,9 +98,9 @@ export default function DonationStripeForm({
     medium: { amount: number, icon: string, label: string };
     large: { amount: number, icon: string, label: string };
   }>({
-    small: { amount: 500, icon: 'water_sip', label: 'Łyk wody' },
-    medium: { amount: 1000, icon: 'warm_meal', label: 'Ciepły posiłek' },
-    large: { amount: 2000, icon: 'doctor_visit', label: 'Wizyta u lekarza' },
+    small: { amount: 1500, icon: 'water_sip', label: 'Łyk wody' },
+    medium: { amount: 5000, icon: 'warm_meal', label: 'Ciepły posiłek' },
+    large: { amount: 10000, icon: 'doctor_visit', label: 'Wizyta u lekarza' },
   });
 
   // Get icon component from the icon ID
@@ -129,27 +129,32 @@ export default function DonationStripeForm({
           const mediumIconId = profile.medium_icon || 'warm_meal';
           const largeIconId = profile.large_icon || 'doctor_visit';
           
+          // Convert the PLN amounts to cents for Stripe
+          const smallAmount = (profile.small_coffee_amount || 15) * 100;
+          const mediumAmount = (profile.medium_coffee_amount || 50) * 100;
+          const largeAmount = (profile.large_coffee_amount || 100) * 100;
+          
           // Update donation options based on creator's settings
           setDonationOptions({
             small: {
-              amount: profile.small_coffee_amount || 500,
+              amount: smallAmount,
               icon: smallIconId,
               label: getLabelForIcon(smallIconId)
             },
             medium: {
-              amount: profile.medium_coffee_amount || 1000,
+              amount: mediumAmount,
               icon: mediumIconId,
               label: getLabelForIcon(mediumIconId)
             },
             large: {
-              amount: profile.large_coffee_amount || 2000,
+              amount: largeAmount,
               icon: largeIconId, 
               label: getLabelForIcon(largeIconId)
             }
           });
           
-          // Set default selected amount
-          setSelectedAmount(profile.medium_coffee_amount || 1000);
+          // Set default selected amount to medium
+          setSelectedAmount(mediumAmount);
         } else {
           console.error('Failed to load profile:', result.error);
         }
