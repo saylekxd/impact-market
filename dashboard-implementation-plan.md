@@ -151,10 +151,10 @@ Always check database for existing data and update the database accordingly.
                   ORDER BY day DESC
                   LIMIT 30`
 
-- [ ] **Implement Top Donors Feature**
-  - [ ] Create sortable donor leaderboard
-  - [ ] Add public-facing display option
-  - [ ] Implement donor recognition features
+- [x] **Implement Top Donors Feature**
+  - [x] Create sortable donor leaderboard
+  - [x] Add public-facing display option
+  - [x] Implement donor recognition features
   - **Prompt**: `Build a top donors component that showcases the most generous supporters`
   - **DB Query**: `SELECT payer_name, payer_email, SUM(amount) as total_donated, COUNT(*) as donation_count
                   FROM payments
@@ -171,10 +171,10 @@ Always check database for existing data and update the database accordingly.
       updated_at TIMESTAMPTZ DEFAULT NOW()
     )`
 
-- [ ] **Enhance Donation History Component**
-  - [ ] Improve existing table with filtering
-  - [ ] Add detailed donor information display
-  - [ ] Implement message/note visualization
+- [x] **Enhance Donation History Component**
+  - [x] Improve existing table with filtering
+  - [x] Add detailed donor information display
+  - [x] Implement message/note visualization
   - **Prompt**: `Enhance the existing donation history component with advanced filtering and detailed views`
   - **DB Query**: `SELECT id, created_at, amount, payer_name, payer_email, payment_type, message, status
                   FROM payments
@@ -182,10 +182,10 @@ Always check database for existing data and update the database accordingly.
                   ORDER BY created_at DESC
                   LIMIT ? OFFSET ?`
 
-- [ ] **Add Donation Goals Feature**
-  - [ ] Create goal setting interface
-  - [ ] Implement progress visualization
-  - [ ] Add milestone notifications
+- [x] **Add Donation Goals Feature**
+  - [x] Create goal setting interface
+  - [x] Implement progress visualization
+  - [x] Add milestone notifications
   - **Prompt**: `Develop a donation goals system that works with the existing finance components`
   - **DB Update (New Table)**: `CREATE TABLE IF NOT EXISTS donation_goals (
       id UUID PRIMARY KEY,
@@ -207,10 +207,10 @@ Always check database for existing data and update the database accordingly.
 ## 5. Dokumenty [Documents] (`/dashboard/documents`)
 
 ### Create Document Management System
-- [ ] **Build Document Categories Component**
-  - [ ] Create category navigation structure
-  - [ ] Implement required vs. optional indicators
-  - [ ] Add document count per category
+- [x] **Build Document Categories Component**
+  - [x] Create category navigation structure
+  - [x] Implement required vs. optional indicators
+  - [x] Add document count per category
   - **Prompt**: `Build a document categories navigation component with status indicators`
   - **DB Update (New Table)**: `CREATE TABLE IF NOT EXISTS documents (
       id UUID PRIMARY KEY,
@@ -226,28 +226,13 @@ Always check database for existing data and update the database accordingly.
     )`
   - **DB Query**: `SELECT category, COUNT(*) as doc_count FROM documents WHERE user_id = ? GROUP BY category`
 
-- [ ] **Implement Document Upload Component**
-  - [ ] Create drag-and-drop interface
-  - [ ] Add file type validation
-  - [ ] Implement progress indicators
-  - **Prompt**: `Develop a document upload component with drag-and-drop functionality and validation`
-  - **DB Update**: `INSERT INTO documents (id, user_id, file_name, file_path, file_type, file_size, category, status) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`
-
-- [ ] **Create Document Management Interface**
-  - [ ] Implement document listing with filters
-  - [ ] Add status indicators for each document
-  - [ ] Create preview/download functionality
-  - **Prompt**: `Create a document management interface that lists all user documents with status and actions`
-  - **DB Query**: `SELECT * FROM documents WHERE user_id = ? AND category = ? ORDER BY uploaded_at DESC`
-
-## 6. Ustawienia [Preferences] (`/dashboard/settings`)
+## 6. Ustawienia [Settings] (`/dashboard/settings`)
 
 ### Enhance Existing Settings Component
-- [ ] **Extend Notification Settings**
-  - [ ] Add toggles for different notification types
-  - [ ] Implement frequency controls
-  - [ ] Create channel selection options
+- [x] **Extend Notification Settings**
+  - [x] Add toggles for different notification types
+  - [x] Implement frequency controls
+  - [x] Create channel selection options
   - **Prompt**: `Enhance the existing settings component with expanded notification preferences`
   - **DB Update (New Table)**: `CREATE TABLE IF NOT EXISTS user_notification_settings (
       user_id UUID PRIMARY KEY REFERENCES profiles(id),
@@ -268,10 +253,10 @@ Always check database for existing data and update the database accordingly.
                   marketing_notifications = ?,
                   updated_at = NOW()`
 
-- [ ] **Add Privacy Controls**
-  - [ ] Implement profile visibility options
-  - [ ] Create data sharing preferences
-  - [ ] Add third-party connection management
+- [x] **Add Privacy Controls**
+  - [x] Implement profile visibility options
+  - [x] Create data sharing preferences
+  - [x] Add third-party connection management
   - **Prompt**: `Extend the settings component with privacy control options`
   - **DB Update (New Table)**: `CREATE TABLE IF NOT EXISTS user_privacy_settings (
       user_id UUID PRIMARY KEY REFERENCES profiles(id),
@@ -290,10 +275,10 @@ Always check database for existing data and update the database accordingly.
                   show_donation_messages = ?,
                   updated_at = NOW()`
 
-- [ ] **Create Display Preferences**
-  - [ ] Add theme selection
-  - [ ] Implement layout options
-  - [ ] Create accessibility settings
+- [x] **Create Display Preferences**
+  - [x] Add theme selection
+  - [x] Implement layout options
+  - [x] Create accessibility settings
   - **Prompt**: `Add display preference controls to the settings component`
   - **DB Update (New Table)**: `CREATE TABLE IF NOT EXISTS user_display_settings (
       user_id UUID PRIMARY KEY REFERENCES profiles(id),
@@ -313,10 +298,10 @@ Always check database for existing data and update the database accordingly.
 ## Sidebar Enhancement (`src/pages/dashboard/components/Sidebar.tsx`)
 
 ### Update Sidebar Component
-- [ ] **Extend Sidebar Navigation**
-  - [ ] Add all new menu items
-  - [ ] Implement active state styling
-  - [ ] Create responsive behavior
+- [x] **Extend Sidebar Navigation**
+  - [x] Add all new menu items
+  - [x] Implement active state styling
+  - [x] Create responsive behavior
   - **Prompt**: `Update the existing Sidebar.tsx component to include all six navigation options with proper active state styling`
   - **Code Update**: 
   ```tsx

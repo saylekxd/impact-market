@@ -7,7 +7,7 @@ import Register from './pages/Register';
 import CreatorProfile from './pages/CreatorProfile';
 import Dashboard from './pages/Dashboard';
 import Finances from './pages/Finances';
-import Settings from './pages/Settings';
+import Settings from './pages/dashboard/Settings';
 import Icons from './pages/dashboard/Icons';
 import Withdraws from './pages/dashboard/Withdraws';
 import PaymentTest from './pages/PaymentTest';
@@ -21,6 +21,7 @@ import { PaymentsProvider } from './contexts/PaymentsContext';
 import { PayoutProvider } from './contexts/PayoutContext';
 import StripeProvider from './components/StripeProvider';
 import Donations from './pages/dashboard/Donations';
+import Documents from './pages/dashboard/Documents';
 
 // Wrapped App component to use hooks
 function AppContent() {
@@ -46,6 +47,7 @@ function AppContent() {
         <Route path="/dashboard/icons" element={<Icons />} />
         <Route path="/dashboard/withdraws" element={<Withdraws />} />
         <Route path="/dashboard/donations" element={<Donations />} />
+        <Route path="/dashboard/documents" element={<Documents />} />
         <Route path="/:username" element={<CreatorProfile />} />
         <Route path="/payment/test" element={<PaymentTest />} />
         <Route path="/payment/success" element={<PaymentSuccess />} />

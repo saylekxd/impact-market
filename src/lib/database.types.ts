@@ -208,6 +208,85 @@ export interface Database {
           updated_at?: string;
         };
       };
+      donation_goals: {
+        Row: {
+          id: string;
+          user_id: string;
+          title: string;
+          description: string;
+          target_amount: number;
+          current_amount: number;
+          start_date: string;
+          end_date: string;
+          active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          title: string;
+          description: string;
+          target_amount: number;
+          current_amount?: number;
+          start_date: string;
+          end_date: string;
+          active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          title?: string;
+          description?: string;
+          target_amount?: number;
+          current_amount?: number;
+          start_date?: string;
+          end_date?: string;
+          active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      documents: {
+        Row: {
+          id: string;
+          user_id: string;
+          file_name: string;
+          file_path: string;
+          file_type: string;
+          file_size: number;
+          category: string;
+          status: string;
+          uploaded_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          file_name: string;
+          file_path: string;
+          file_type: string;
+          file_size: number;
+          category: string;
+          status?: string;
+          uploaded_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          file_name?: string;
+          file_path?: string;
+          file_type?: string;
+          file_size?: number;
+          category?: string;
+          status?: string;
+          uploaded_at?: string;
+          updated_at?: string;
+        };
+      };
     };
   };
 }
