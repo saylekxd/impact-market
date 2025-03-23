@@ -7,6 +7,11 @@ export default function BankAccountForm() {
   const { bankAccount, saveBankAccount, loading: contextLoading } = usePayouts();
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [errors, setErrors] = useState({
+    account_number: '',
+    bank_name: '',
+    swift_code: '',
+  });
   const [formData, setFormData] = useState({
     account_number: '',
     bank_name: '',
@@ -24,8 +29,55 @@ export default function BankAccountForm() {
     }
   }, [bankAccount]);
 
+  const validateForm = () => {
+    const newErrors = {
+      account_number: '',
+      bank_name: '',
+      swift_code: '',
+    };
+    let isValid = true;
+
+    // Validate account number (Polish IBAN format)
+    const accountNumberRegex = /^PL\d{26}$/;
+    if (!formData.account_number) {
+      newErrors.account_number = 'Numer konta jest wymagany';
+      isValid = false;
+    } else if (!accountNumberRegex.test(formData.account_number.replace(/\s/g, ''))) {
+      newErrors.account_number = 'Nieprawidłowy format numeru konta (wymagany format: PL + 26 cyfr)';
+      isValid = false;
+    }
+
+    // Validate bank name
+    if (!formData.bank_name) {
+      newErrors.bank_name = 'Nazwa banku jest wymagana';
+      isValid = false;
+    } else if (formData.bank_name.length < 2) {
+      newErrors.bank_name = 'Nazwa banku jest za krótka';
+      isValid = false;
+    }
+
+    // Validate SWIFT/BIC code
+    const swiftRegex = /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/;
+    if (!formData.swift_code) {
+      newErrors.swift_code = 'Kod SWIFT/BIC jest wymagany';
+      isValid = false;
+    } else if (!swiftRegex.test(formData.swift_code)) {
+      newErrors.swift_code = 'Nieprawidłowy format kodu SWIFT/BIC';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      toast.error('Proszę poprawić błędy w formularzu');
+      return;
+    }
+
     setLoading(true);
     
     try {
@@ -36,6 +88,15 @@ export default function BankAccountForm() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    if (errors[name as keyof typeof errors]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
@@ -56,7 +117,7 @@ export default function BankAccountForm() {
             <h3 className="text-lg font-medium text-gray-900">Twoje dane bankowe</h3>
             <button
               onClick={() => setIsEditing(true)}
-              className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+              className="text-[#FF9F2D] hover:text-[#f39729] flex items-center gap-1"
             >
               <Pencil className="h-4 w-4" />
               <span>Edytuj</span>
@@ -92,12 +153,18 @@ export default function BankAccountForm() {
         <input
           type="text"
           id="account_number"
+          name="account_number"
           required
           value={formData.account_number}
-          onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          onChange={handleInputChange}
+          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm ${
+            errors.account_number ? 'border-red-300' : ''
+          }`}
           placeholder="PL00 0000 0000 0000 0000 0000 0000"
         />
+        {errors.account_number && (
+          <p className="mt-1 text-sm text-red-600">{errors.account_number}</p>
+        )}
       </div>
 
       <div>
@@ -107,12 +174,18 @@ export default function BankAccountForm() {
         <input
           type="text"
           id="bank_name"
+          name="bank_name"
           required
           value={formData.bank_name}
-          onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          onChange={handleInputChange}
+          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm ${
+            errors.bank_name ? 'border-red-300' : ''
+          }`}
           placeholder="Nazwa banku"
         />
+        {errors.bank_name && (
+          <p className="mt-1 text-sm text-red-600">{errors.bank_name}</p>
+        )}
       </div>
 
       <div>
@@ -122,19 +195,25 @@ export default function BankAccountForm() {
         <input
           type="text"
           id="swift_code"
+          name="swift_code"
           required
           value={formData.swift_code}
-          onChange={(e) => setFormData({ ...formData, swift_code: e.target.value })}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          onChange={handleInputChange}
+          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm ${
+            errors.swift_code ? 'border-red-300' : ''
+          }`}
           placeholder="BREXPLPWXXX"
         />
+        {errors.swift_code && (
+          <p className="mt-1 text-sm text-red-600">{errors.swift_code}</p>
+        )}
       </div>
 
       <div className="flex gap-4">
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          className="flex-1 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#FF9F2D] hover:bg-[#f39729] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF9F2D] disabled:opacity-50"
         >
           {loading ? 'Zapisywanie...' : bankAccount ? 'Zapisz zmiany' : 'Zapisz dane bankowe'}
         </button>
@@ -149,8 +228,13 @@ export default function BankAccountForm() {
                 bank_name: bankAccount?.bank_name || '',
                 swift_code: bankAccount?.swift_code || '',
               });
+              setErrors({
+                account_number: '',
+                bank_name: '',
+                swift_code: '',
+              });
             }}
-            className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF9F2D]"
           >
             Anuluj
           </button>

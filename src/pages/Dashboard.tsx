@@ -5,12 +5,13 @@ import { usePayments } from '../contexts/PaymentsContext';
 import { toast } from 'react-hot-toast';
 import { profiles } from '../lib/profiles';
 import type { Profile } from '../lib/profiles';
-import { TrendingUp, Users, CreditCard, Calendar, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import {ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
 import ProfileForm from './dashboard/components/ProfileForm';
 import ProfileSection from './dashboard/components/ProfileSection';
 import ProfileHeader from './dashboard/components/ProfileHeader';
 import ProfileStatistics from './dashboard/components/ProfileStatistics';
+import PersonalDataManagement from './dashboard/components/PersonalDataManagement';
 import { motion } from 'framer-motion';
 
 export default function Dashboard() {
@@ -225,67 +226,15 @@ export default function Dashboard() {
           </div>
         </motion.div>
 
-        {/* Historia wpłat */}
+        {/* Personal Data Management */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
           className="bg-white rounded-xl shadow-sm overflow-hidden"
         >
           <div className="p-6">
-            <h2 className="text-xl font-bold tracking-tight text-black mb-6">Historia wpłat</h2>
-            {payments.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-500 font-medium">Brak wpłat</p>
-                <p className="text-sm text-gray-400 mt-2">
-                  Udostępnij swój profil, aby zacząć otrzymywać wsparcie
-                </p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead>
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Data
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Kwota
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Od
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Wiadomość
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {payments.map((payment, index) => (
-                      <motion.tr 
-                        key={payment.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: 0.1 + (index * 0.05) }}
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {new Date(payment.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {(payment.amount / 100).toFixed(2)} PLN
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {payment.payer_name || 'Anonim'}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-500">
-                          {payment.message || '-'}
-                        </td>
-                      </motion.tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <PersonalDataManagement />
           </div>
         </motion.div>
       </div>

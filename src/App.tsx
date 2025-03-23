@@ -4,6 +4,7 @@ import { MinimalHeader } from './components/ui/minimal-header';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Onboarding from './pages/Onboarding';
 import CreatorProfile from './pages/CreatorProfile';
 import Dashboard from './pages/Dashboard';
 import Finances from './pages/Finances';
@@ -32,7 +33,8 @@ function AppContent() {
   const isDashboardRoute = location.pathname.startsWith('/dashboard');
   
   // Only show header if user is not logged in or not on a dashboard page
-  const showHeader = !user || !isDashboardRoute;
+  // Also don't show header on onboarding page
+  const showHeader = !user || (!isDashboardRoute && !location.pathname.startsWith('/onboarding'));
   
   return (
     <div className="min-h-screen">
@@ -41,6 +43,7 @@ function AppContent() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/dashboard/finances" element={<Finances />} />
         <Route path="/dashboard/settings" element={<Settings />} />

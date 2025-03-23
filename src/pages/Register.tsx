@@ -51,7 +51,7 @@ export default function Register() {
 
       if (profileError) throw profileError;
 
-      navigate('/dashboard');
+      navigate('/onboarding');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Wystąpił błąd podczas rejestracji');
     } finally {
