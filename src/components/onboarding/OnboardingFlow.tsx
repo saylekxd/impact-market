@@ -11,12 +11,14 @@ import AccountTypeSelection from './AccountTypeSelection';
 import PersonalDataForm from './PersonalDataForm';
 import PhoneVerification from './PhoneVerification';
 import BankAccountForm from '../../components/BankAccountForm';
+import IconSelectionForm from './IconSelectionForm';
 
 // Define steps for the onboarding flow
 type OnboardingStep = 
   | 'account_type' 
   | 'personal_data' 
   | 'phone_verification' 
+  | 'icon_selection'
   | 'bank_account' 
   | 'completed';
 
@@ -37,17 +39,18 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ userId }) => {
   useEffect(() => {
     switch (currentStep) {
       case 'account_type':
-        setProgress(25);
+        setProgress(20);
         break;
       case 'personal_data':
-        setProgress(50);
+        setProgress(40);
         break;
       case 'phone_verification':
-        setProgress(75);
+        setProgress(60);
+        break;
+      case 'icon_selection':
+        setProgress(80);
         break;
       case 'bank_account':
-        setProgress(90);
-        break;
       case 'completed':
         setProgress(100);
         break;
@@ -63,8 +66,11 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ userId }) => {
       case 'phone_verification':
         setCurrentStep('personal_data');
         break;
-      case 'bank_account':
+      case 'icon_selection':
         setCurrentStep('phone_verification');
+        break;
+      case 'bank_account':
+        setCurrentStep('icon_selection');
         break;
       default:
         break;
@@ -167,6 +173,11 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ userId }) => {
 
   // Handle phone verification completion
   const handlePhoneVerificationCompleted = () => {
+    setCurrentStep('icon_selection');
+  };
+
+  // Handle icon selection completion
+  const handleIconSelectionCompleted = () => {
     setCurrentStep('bank_account');
   };
 
@@ -206,6 +217,14 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ userId }) => {
             phoneNumber={phoneNumber} 
             onCompleted={handlePhoneVerificationCompleted} 
             onChangePhone={() => setCurrentStep('personal_data')}
+          />
+        );
+      case 'icon_selection':
+        return (
+          <IconSelectionForm
+            userId={userId}
+            accountType={accountType}
+            onCompleted={handleIconSelectionCompleted}
           />
         );
       case 'bank_account':
@@ -287,54 +306,70 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ userId }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#1a1a1a] text-white">
+    <div className="min-h-screen bg-[#1a1a1a] text-white overflow-y-auto">
       {/* Progress bar */}
-      <div className="pt-6 px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="sticky top-0 z-20 bg-[#1a1a1a] pt-4 sm:pt-6 px-3 sm:px-4 lg:px-8">
         <div className="max-w-3xl mx-auto">
           {/* Back button */}
           {currentStep !== 'account_type' && currentStep !== 'completed' && (
             <button
               onClick={handleBack}
-              className="flex items-center text-gray-400 hover:text-white mb-4 transition-colors"
+              className="flex items-center text-gray-400 hover:text-white mb-3 sm:mb-4 transition-colors"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Wstecz
             </button>
           )}
 
+          {/* Step indicators - Hide on very small screens */}
+          <div className="hidden sm:grid grid-cols-5 gap-2 mb-6">
+            <div className={`p-1 text-center text-xs ${currentStep === 'account_type' || progress >= 20 ? 'text-[#FF9F2D]' : 'text-gray-500'}`}>
+              Typ Konta
+            </div>
+            <div className={`p-1 text-center text-xs ${currentStep === 'personal_data' || progress >= 40 ? 'text-[#FF9F2D]' : 'text-gray-500'}`}>
+              Dane Osobowe
+            </div>
+            <div className={`p-1 text-center text-xs ${currentStep === 'phone_verification' || progress >= 60 ? 'text-[#FF9F2D]' : 'text-gray-500'}`}>
+              Weryfikacja
+            </div>
+            <div className={`p-1 text-center text-xs ${currentStep === 'icon_selection' || progress >= 80 ? 'text-[#FF9F2D]' : 'text-gray-500'}`}>
+              Wybór Ikony
+            </div>
+            <div className={`p-1 text-center text-xs ${currentStep === 'bank_account' || currentStep === 'completed' ? 'text-[#FF9F2D]' : 'text-gray-500'}`}>
+              Konto Bankowe
+            </div>
+          </div>
+
+          {/* Current step indicator for mobile */}
+          <div className="block sm:hidden mb-3">
+            <span className="text-sm text-gray-400">
+              {currentStep === 'account_type' && 'Typ Konta'}
+              {currentStep === 'personal_data' && 'Dane Osobowe'}
+              {currentStep === 'phone_verification' && 'Weryfikacja'}
+              {currentStep === 'icon_selection' && 'Wybór Ikony'}
+              {currentStep === 'bank_account' && 'Konto Bankowe'}
+              {currentStep === 'completed' && 'Zakończono'}
+            </span>
+          </div>
+
+          {/* Progress bar */}
           <div className="mb-4">
-            <div className="flex justify-between text-sm text-gray-400 mb-1">
+            <div className="flex justify-between text-xs sm:text-sm text-gray-400 mb-1">
               <span>Postęp Rejestracji</span>
               <span>{progress}%</span>
             </div>
-            <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 sm:h-2 bg-gray-700 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-[#FF9F2D] rounded-full transition-all duration-500 ease-in-out" 
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
           </div>
-
-          {/* Step indicators */}
-          <div className="grid grid-cols-4 gap-2 mb-8">
-            <div className={`p-1 text-center text-xs ${currentStep === 'account_type' || progress >= 25 ? 'text-[#FF9F2D]' : 'text-gray-500'}`}>
-              Typ Konta
-            </div>
-            <div className={`p-1 text-center text-xs ${currentStep === 'personal_data' || progress >= 50 ? 'text-[#FF9F2D]' : 'text-gray-500'}`}>
-              Dane Osobowe
-            </div>
-            <div className={`p-1 text-center text-xs ${currentStep === 'phone_verification' || progress >= 75 ? 'text-[#FF9F2D]' : 'text-gray-500'}`}>
-              Weryfikacja
-            </div>
-            <div className={`p-1 text-center text-xs ${currentStep === 'bank_account' || currentStep === 'completed' ? 'text-[#FF9F2D]' : 'text-gray-500'}`}>
-              Konto Bankowe
-            </div>
-          </div>
         </div>
       </div>
 
       {/* Render the current step */}
-      <div className="relative z-10 pb-10">
+      <div className="relative z-10 pb-6 sm:pb-10">
         {renderStep()}
       </div>
     </div>

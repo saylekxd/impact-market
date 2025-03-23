@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { Droplets, UtensilsCrossed, Stethoscope, Pill, Coffee, Leaf, Mountain, Bird, Building, PenTool, Monitor, Bone, Utensils, Waves, Sandwich, Soup, Ambulance, Sprout, TreePine, TreeDeciduous, Users, Globe, BookOpen, Backpack, Laptop, GraduationCap, Palette, Brush, Home } from 'lucide-react';
+import { 
+  Droplets, UtensilsCrossed, Stethoscope, Pill, Coffee, Leaf, Mountain, Bird, Building, PenTool, 
+  Monitor, Bone, Utensils, Waves, Sandwich, Soup, Ambulance, Sprout, TreePine, TreeDeciduous, 
+  Users, Globe, BookOpen, Backpack, Laptop, GraduationCap, Palette, Brush, Home, Heart, Shirt, School, 
+  Apple, Pizza, Activity, HeartHandshake, CloudRain, Sunset, Footprints, Dog, Cat, BrainCircuit, 
+  PencilRuler, BookMarked, Microscope, Gamepad2, Code, Smartphone, Trophy, Medal, Music, Piano, 
+  Drum, Film, Camera, PaintBucket, ShoppingBag, Gift, Phone, Mail, Send, Wind, CheckCircle 
+} from 'lucide-react';
 import StripePaymentForm from './StripePaymentForm';
 import { donations } from '../lib/donations';
 import { profiles } from '../lib/profiles';
@@ -18,56 +25,130 @@ interface DonationStripeFormProps {
 const ICON_MAP: Record<string, React.ElementType> = {
   // Humanitarian aid
   water_sip: Droplets,
+  bread: Sandwich,
+  clothes: Shirt,
+  shelter: Home,
   water_bottle: Coffee,
+  hope_kit: HeartHandshake,
+  emergency_aid: Heart,
   village_well: Waves,
+  aid_program: Users,
+  community_help: Building,
   
   // Food
   sandwich: Sandwich,
+  apple: Apple,
+  snack: Coffee,
   warm_meal: UtensilsCrossed,
+  pizza: Pizza,
+  grocery: ShoppingBag,
   family_meals: Soup,
+  food_for_month: Pizza,
+  community_kitchen: UtensilsCrossed,
   
   // Medical
   first_aid: Pill,
+  vitamins: Activity,
+  bandages: Pill,
   doctor_visit: Stethoscope,
+  therapy: Heart,
+  health_exam: Activity,
   life_saving: Ambulance,
+  surgery: Activity,
+  medical_equipment: Activity,
   
   // Ecology
   small_plant: Sprout,
+  seed: Leaf,
+  recycling: Wind,
   tree: TreePine,
+  garden: Leaf,
+  clean_river: Waves,
   forest: TreeDeciduous,
+  ecosystem: Mountain,
+  conservation: TreeDeciduous,
   
   // Nature
   green_leaf: Leaf,
+  rain_drop: Droplets,
+  clean_air: Wind,
   new_plant: Sprout,
-  ecosystem: Mountain,
+  water_cleaning: CloudRain,
+  nature_education: BookOpen,
+  natural_renewal: Mountain,
+  park_creation: Sunset,
+  wilderness: TreeDeciduous,
   
   // Animals
   bird_nest: Bird,
+  cat_food: Cat,
+  dog_walk: Footprints,
   animal_family: Users,
+  vet_visit: Dog,
+  shelter_support: Home,
   reserve: Globe,
+  endangered: Bird,
+  wildlife_program: Footprints,
   
   // Education
   notebook: PenTool,
+  pencil: PencilRuler,
+  book: BookOpen,
   textbook: BookOpen,
+  library_visit: BookMarked,
+  science_kit: Microscope,
   school_supplies: Backpack,
+  school_year: School,
+  learning_center: Building,
   
   // Online learning
   online_hour: Monitor,
+  coding_lesson: Code,
+  e_book: Smartphone,
   laptop: Laptop,
+  online_course: BrainCircuit,
+  digital_tools: Gamepad2,
   scholarship: GraduationCap,
+  tech_education: Code,
+  digital_academy: Trophy,
   
   // Pet help
   pet_food: Utensils,
+  pet_toy: Bone,
+  pet_treat: Gift,
   pet_bed: Bone,
+  pet_grooming: Cat,
+  pet_medicine: Pill,
   pet_care: Home,
+  pet_surgery: Pill,
+  shelter_renovation: Building,
   
   // Arts
   art_supplies: Palette,
+  music_lesson: Music,
+  theater_ticket: Film,
   art_project: Brush,
+  instrument: Piano,
+  photography: Camera,
   art_festival: Building,
+  creative_space: PaintBucket,
+  cultural_program: Drum,
+  
+  // Communication
+  phone_call: Phone,
+  text_message: Mail,
+  internet_hour: Globe,
+  mobile_data: Smartphone,
+  weekly_plan: Send,
+  smartphone: Phone,
+  year_connection: Globe,
+  communication_center: Smartphone,
+  tech_access: Send,
   
   // Legacy icons (for backward compatibility)
   coffee: Coffee,
+  check_circle: CheckCircle,
+  medal: Medal,
 };
 
 // Default icon when we don't have a mapping
@@ -105,7 +186,22 @@ export default function DonationStripeForm({
 
   // Get icon component from the icon ID
   const getIconForId = (iconId: string): React.ElementType => {
-    return ICON_MAP[iconId] || DEFAULT_ICON;
+    // Ensure we have a valid string
+    if (!iconId || typeof iconId !== 'string') {
+      console.warn('Invalid icon ID provided:', iconId);
+      return DEFAULT_ICON;
+    }
+
+    // Try to find the icon in our map
+    const IconComponent = ICON_MAP[iconId];
+    
+    // If not found, log a warning and return default
+    if (!IconComponent) {
+      console.warn(`Icon not found for ID: "${iconId}", using default`);
+      return DEFAULT_ICON;
+    }
+    
+    return IconComponent;
   };
 
   // Load creator profile on mount to get donation settings
@@ -129,10 +225,40 @@ export default function DonationStripeForm({
           const mediumIconId = profile.medium_icon || 'warm_meal';
           const largeIconId = profile.large_icon || 'doctor_visit';
           
+          // Check if the icons are in our map and log warnings if not
+          if (!ICON_MAP[smallIconId]) {
+            console.warn(`Small icon ID "${smallIconId}" not found in icon map, using default`);
+          }
+          if (!ICON_MAP[mediumIconId]) {
+            console.warn(`Medium icon ID "${mediumIconId}" not found in icon map, using default`);
+          }
+          if (!ICON_MAP[largeIconId]) {
+            console.warn(`Large icon ID "${largeIconId}" not found in icon map, using default`);
+          }
+          
           // Convert the PLN amounts to cents for Stripe
           const smallAmount = (profile.small_coffee_amount || 15) * 100;
           const mediumAmount = (profile.medium_coffee_amount || 50) * 100;
           const largeAmount = (profile.large_coffee_amount || 100) * 100;
+          
+          // Log the icon and label combinations for debugging
+          console.log('Setting donation options:', {
+            small: {
+              icon: smallIconId,
+              label: getLabelForIcon(smallIconId),
+              component: ICON_MAP[smallIconId] ? 'Found' : 'Not found'
+            },
+            medium: {
+              icon: mediumIconId,
+              label: getLabelForIcon(mediumIconId),
+              component: ICON_MAP[mediumIconId] ? 'Found' : 'Not found'
+            },
+            large: {
+              icon: largeIconId,
+              label: getLabelForIcon(largeIconId),
+              component: ICON_MAP[largeIconId] ? 'Found' : 'Not found'
+            }
+          });
           
           // Update donation options based on creator's settings
           setDonationOptions({
@@ -174,56 +300,130 @@ export default function DonationStripeForm({
     const labelMap: Record<string, string> = {
       // Humanitarian aid
       'water_sip': 'Łyk wody',
+      'bread': 'Bochenek chleba',
+      'clothes': 'Ubrania',
+      'shelter': 'Schronienie',
       'water_bottle': 'Butelka wody',
+      'hope_kit': 'Paczka nadziei',
+      'emergency_aid': 'Pomoc doraźna',
       'village_well': 'Studnia dla wioski',
+      'aid_program': 'Program pomocowy',
+      'community_help': 'Odbudowa społeczności',
       
       // Food
       'sandwich': 'Kanapka dla dziecka',
+      'apple': 'Owoce na przerwę',
+      'snack': 'Przekąska',
       'warm_meal': 'Ciepły posiłek',
+      'pizza': 'Pizza dla rodziny',
+      'grocery': 'Zakupy spożywcze',
       'family_meals': 'Obiady dla rodziny',
+      'food_for_month': 'Wyżywienie na miesiąc',
+      'community_kitchen': 'Kuchnia społeczna',
       
       // Medical
       'first_aid': 'Leki na pierwszą pomoc',
+      'vitamins': 'Witaminy',
+      'bandages': 'Opatrunki',
       'doctor_visit': 'Wizyta u lekarza',
+      'therapy': 'Sesja terapeutyczna',
+      'health_exam': 'Badania zdrowotne',
       'life_saving': 'Ratowanie życia',
+      'surgery': 'Operacja',
+      'medical_equipment': 'Sprzęt medyczny',
       
       // Ecology
       'small_plant': 'Mała sadzonka',
+      'seed': 'Ziarno przyszłości',
+      'recycling': 'Recykling',
       'tree': 'Dojrzałe drzewo',
+      'garden': 'Ogród społeczny',
+      'clean_river': 'Oczyszczanie rzeki',
       'forest': 'Cały las',
+      'ecosystem': 'Odnowa ekosystemu',
+      'conservation': 'Program ochrony',
       
       // Nature
       'green_leaf': 'Zielony listek',
+      'rain_drop': 'Kropla deszczu',
+      'clean_air': 'Czyste powietrze',
       'new_plant': 'Nowa roślina',
-      'ecosystem': 'Odnowa ekosystemu',
+      'water_cleaning': 'Oczyszczanie wody',
+      'nature_education': 'Edukacja ekologiczna',
+      'natural_renewal': 'Odnowa naturalnego środowiska',
+      'park_creation': 'Tworzenie parku',
+      'wilderness': 'Ochrona dzikich terenów',
       
       // Animals
       'bird_nest': 'Pisklę w gnieździe',
+      'cat_food': 'Karma dla kota',
+      'dog_walk': 'Spacer z psem',
       'animal_family': 'Opieka nad rodziną zwierząt',
+      'vet_visit': 'Wizyta u weterynarza',
+      'shelter_support': 'Wsparcie schroniska',
       'reserve': 'Ochrona rezerwatu',
+      'endangered': 'Ratowanie zagrożonych gatunków',
+      'wildlife_program': 'Program dla dzikich zwierząt',
       
       // Education
       'notebook': 'Zeszyt i długopis',
+      'pencil': 'Przybory szkolne',
+      'book': 'Książka edukacyjna',
       'textbook': 'Podręcznik szkolny',
+      'library_visit': 'Dostęp do biblioteki',
+      'science_kit': 'Zestaw naukowy',
       'school_supplies': 'Cała wyprawka',
+      'school_year': 'Rok nauki',
+      'learning_center': 'Centrum nauki',
       
       // Online learning
       'online_hour': 'Godzina nauki online',
+      'coding_lesson': 'Lekcja programowania',
+      'e_book': 'E-book edukacyjny',
       'laptop': 'Laptop dla ucznia',
+      'online_course': 'Kurs online',
+      'digital_tools': 'Narzędzia cyfrowe',
       'scholarship': 'Stypendium edukacyjne',
+      'tech_education': 'Edukacja technologiczna',
+      'digital_academy': 'Akademia cyfrowa',
       
       // Pet help
       'pet_food': 'Puszka karmy',
+      'pet_toy': 'Zabawka dla zwierzaka',
+      'pet_treat': 'Przysmak',
       'pet_bed': 'Legowisko i leczenie',
+      'pet_grooming': 'Pielęgnacja',
+      'pet_medicine': 'Leki dla zwierzaka',
       'pet_care': 'Opieka przez rok',
+      'pet_surgery': 'Operacja zwierzaka',
+      'shelter_renovation': 'Remont schroniska',
       
       // Arts
       'art_supplies': 'Pędzel i farby',
+      'music_lesson': 'Lekcja muzyki',
+      'theater_ticket': 'Bilet do teatru',
       'art_project': 'Wsparcie jednego projektu',
+      'instrument': 'Instrument muzyczny',
+      'photography': 'Sprzęt fotograficzny',
       'art_festival': 'Festiwal sztuki',
+      'creative_space': 'Przestrzeń kreatywna',
+      'cultural_program': 'Program kulturalny',
+      
+      // Communication
+      'phone_call': 'Rozmowa telefoniczna',
+      'text_message': 'Wiadomość',
+      'internet_hour': 'Godzina internetu',
+      'mobile_data': 'Pakiet danych',
+      'weekly_plan': 'Tygodniowy plan',
+      'smartphone': 'Smartfon',
+      'year_connection': 'Rok łączności',
+      'communication_center': 'Centrum komunikacji',
+      'tech_access': 'Dostęp do technologii',
       
       // Legacy icons (for backward compatibility)
       'coffee': 'Kawa',
+      'check_circle': 'Potwierdzenie',
+      'medal': 'Medal',
     };
     
     return labelMap[iconId] || 'Wsparcie';

@@ -118,9 +118,9 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
 
   const renderIndividualFields = () => (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div>
-          <label htmlFor="first_name" className="block text-sm font-medium text-gray-300">
+          <label htmlFor="first_name" className="block text-xs sm:text-sm font-medium text-gray-300">
             Imię
           </label>
           <input
@@ -130,11 +130,11 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.first_name}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
         </div>
         <div>
-          <label htmlFor="last_name" className="block text-sm font-medium text-gray-300">
+          <label htmlFor="last_name" className="block text-xs sm:text-sm font-medium text-gray-300">
             Nazwisko
           </label>
           <input
@@ -144,13 +144,43 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.last_name}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="address" className="block text-sm font-medium text-gray-300">
+        <label htmlFor="professional_category" className="block text-xs sm:text-sm font-medium text-gray-300">
+          Kategoria wsparcia
+        </label>
+        <select
+          id="professional_category"
+          name="professional_category"
+          value={formState.professional_category}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
+        >
+          <option value="">Wybierz kategorię...</option>
+          <option value="humanitarian">Pomoc humanitarna</option>
+          <option value="food">Żywność/Gastronomia</option>
+          <option value="medical">Medycyna/Zdrowie</option>
+          <option value="ecology">Ekologia</option>
+          <option value="nature">Ochrona przyrody</option>
+          <option value="animals">Ochrona zwierząt</option>
+          <option value="education">Edukacja</option>
+          <option value="online_learning">Edukacja online</option>
+          <option value="pet_help">Pomoc dla zwierząt</option>
+          <option value="arts">Kultura i sztuka</option>
+          <option value="communication">Komunikacja</option>
+        </select>
+        <p className="mt-1 text-xs text-gray-400">
+          Ta kategoria pomoże nam dopasować odpowiednie ikony do Twojego profilu
+        </p>
+      </div>
+
+      <div>
+        <label htmlFor="address" className="block text-xs sm:text-sm font-medium text-gray-300">
           Adres
         </label>
         <input
@@ -160,13 +190,13 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           value={formState.address}
           onChange={handleChange}
           required
-          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         <div>
-          <label htmlFor="city" className="block text-sm font-medium text-gray-300">
+          <label htmlFor="city" className="block text-xs sm:text-sm font-medium text-gray-300">
             Miasto
           </label>
           <input
@@ -176,11 +206,11 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.city}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
         </div>
         <div>
-          <label htmlFor="postal_code" className="block text-sm font-medium text-gray-300">
+          <label htmlFor="postal_code" className="block text-xs sm:text-sm font-medium text-gray-300">
             Kod Pocztowy
           </label>
           <input
@@ -190,11 +220,11 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.postal_code}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
         </div>
-        <div>
-          <label htmlFor="country" className="block text-sm font-medium text-gray-300">
+        <div className="col-span-2 sm:col-span-1">
+          <label htmlFor="country" className="block text-xs sm:text-sm font-medium text-gray-300">
             Kraj
           </label>
           <input
@@ -204,13 +234,13 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.country}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="phone_number" className="block text-sm font-medium text-gray-300">
+        <label htmlFor="phone_number" className="block text-xs sm:text-sm font-medium text-gray-300">
           Numer Telefonu
         </label>
         <input
@@ -220,7 +250,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           value={formState.phone_number}
           onChange={handleChange}
           required
-          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           placeholder="+48 123 456 789"
         />
       </div>
@@ -230,7 +260,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
   const renderBusinessFields = () => (
     <>
       <div>
-        <label htmlFor="organization_name" className="block text-sm font-medium text-gray-300">
+        <label htmlFor="organization_name" className="block text-xs sm:text-sm font-medium text-gray-300">
           Nazwa Organizacji
         </label>
         <input
@@ -240,33 +270,27 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           value={formState.organization_name}
           onChange={handleChange}
           required
-          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div>
-          <label htmlFor="business_type" className="block text-sm font-medium text-gray-300">
+          <label htmlFor="business_type" className="block text-xs sm:text-sm font-medium text-gray-300">
             Typ Działalności
           </label>
-          <select
+          <input
+            type="text"
             id="business_type"
             name="business_type"
             value={formState.business_type}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
-          >
-            <option value="">Wybierz typ działalności</option>
-            <option value="sole_proprietorship">Jednoosobowa działalność</option>
-            <option value="partnership">Spółka cywilna</option>
-            <option value="llc">Spółka z o.o.</option>
-            <option value="corporation">Spółka akcyjna</option>
-            <option value="other">Inna</option>
-          </select>
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
+          />
         </div>
         <div>
-          <label htmlFor="tax_id" className="block text-sm font-medium text-gray-300">
+          <label htmlFor="tax_id" className="block text-xs sm:text-sm font-medium text-gray-300">
             NIP
           </label>
           <input
@@ -276,45 +300,43 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.tax_id}
             onChange={handleChange}
             required
-            placeholder="np. 1234567890"
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label htmlFor="first_name" className="block text-sm font-medium text-gray-300">
-            Imię Osoby Kontaktowej
-          </label>
-          <input
-            type="text"
-            id="first_name"
-            name="first_name"
-            value={formState.first_name}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
-          />
-        </div>
-        <div>
-          <label htmlFor="last_name" className="block text-sm font-medium text-gray-300">
-            Nazwisko Osoby Kontaktowej
-          </label>
-          <input
-            type="text"
-            id="last_name"
-            name="last_name"
-            value={formState.last_name}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="address" className="block text-sm font-medium text-gray-300">
+        <label htmlFor="professional_category" className="block text-xs sm:text-sm font-medium text-gray-300">
+          Kategoria wsparcia
+        </label>
+        <select
+          id="professional_category"
+          name="professional_category"
+          value={formState.professional_category}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
+        >
+          <option value="">Wybierz kategorię...</option>
+          <option value="humanitarian">Pomoc humanitarna</option>
+          <option value="food">Żywność/Gastronomia</option>
+          <option value="medical">Medycyna/Zdrowie</option>
+          <option value="ecology">Ekologia</option>
+          <option value="nature">Ochrona przyrody</option>
+          <option value="animals">Ochrona zwierząt</option>
+          <option value="education">Edukacja</option>
+          <option value="online_learning">Edukacja online</option>
+          <option value="pet_help">Pomoc dla zwierząt</option>
+          <option value="arts">Kultura i sztuka</option>
+          <option value="communication">Komunikacja</option>
+        </select>
+        <p className="mt-1 text-xs text-gray-400">
+          Ta kategoria pomoże nam dopasować odpowiednie ikony do Twojego profilu
+        </p>
+      </div>
+
+      <div>
+        <label htmlFor="address" className="block text-xs sm:text-sm font-medium text-gray-300">
           Adres Firmy
         </label>
         <input
@@ -325,13 +347,13 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           onChange={handleChange}
           required
           placeholder="Ulica i numer"
-          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         <div>
-          <label htmlFor="city" className="block text-sm font-medium text-gray-300">
+          <label htmlFor="city" className="block text-xs sm:text-sm font-medium text-gray-300">
             Miasto
           </label>
           <input
@@ -341,11 +363,11 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.city}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
         </div>
         <div>
-          <label htmlFor="postal_code" className="block text-sm font-medium text-gray-300">
+          <label htmlFor="postal_code" className="block text-xs sm:text-sm font-medium text-gray-300">
             Kod Pocztowy
           </label>
           <input
@@ -356,11 +378,11 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             onChange={handleChange}
             required
             placeholder="00-000"
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
         </div>
-        <div>
-          <label htmlFor="country" className="block text-sm font-medium text-gray-300">
+        <div className="col-span-2 sm:col-span-1">
+          <label htmlFor="country" className="block text-xs sm:text-sm font-medium text-gray-300">
             Kraj
           </label>
           <input
@@ -371,13 +393,13 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             onChange={handleChange}
             required
             placeholder="Polska"
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="phone_number" className="block text-sm font-medium text-gray-300">
+        <label htmlFor="phone_number" className="block text-xs sm:text-sm font-medium text-gray-300">
           Telefon Firmowy
         </label>
         <input
@@ -387,7 +409,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           value={formState.phone_number}
           onChange={handleChange}
           required
-          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           placeholder="+48 123 456 789"
         />
       </div>
@@ -395,10 +417,10 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
   );
 
   const renderNonprofitFields = () => (
-    <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-2 sm:space-y-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
         <div>
-          <label htmlFor="organization_name" className="block text-sm font-medium text-gray-300">
+          <label htmlFor="organization_name" className="block text-xs font-medium text-gray-300 mb-0.5">
             Nazwa Organizacji
           </label>
           <input
@@ -408,12 +430,12 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.organization_name}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
           />
         </div>
 
         <div>
-          <label htmlFor="business_type" className="block text-sm font-medium text-gray-300">
+          <label htmlFor="business_type" className="block text-xs font-medium text-gray-300 mb-0.5">
             Typ Organizacji
           </label>
           <select
@@ -422,9 +444,9 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.business_type}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
           >
-            <option value="">Wybierz typ organizacji</option>
+            <option value="">Wybierz typ...</option>
             <option value="llc_nonprofit">Spółka z o.o. non profit</option>
             <option value="association">Stowarzyszenie</option>
             <option value="foundation">Fundacja</option>
@@ -432,9 +454,9 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
         <div>
-          <label htmlFor="nonprofit_id" className="block text-sm font-medium text-gray-300">
+          <label htmlFor="nonprofit_id" className="block text-xs font-medium text-gray-300 mb-0.5">
             Numer KRS
           </label>
           <input
@@ -445,13 +467,13 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             onChange={handleChange}
             required
             placeholder="0000000000"
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
           />
         </div>
 
         <div>
-          <label htmlFor="phone_number" className="block text-sm font-medium text-gray-300">
-            Telefon Organizacji
+          <label htmlFor="phone_number" className="block text-xs font-medium text-gray-300 mb-0.5">
+            Telefon
           </label>
           <input
             type="tel"
@@ -460,31 +482,61 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.phone_number}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
             placeholder="+48 123 456 789"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="mission_statement" className="block text-sm font-medium text-gray-300">
-          Misja Organizacji
+        <label htmlFor="mission_statement" className="block text-xs font-medium text-gray-300 mb-0.5">
+          Misja
         </label>
         <textarea
           id="mission_statement"
           name="mission_statement"
-          rows={3}
+          rows={2}
           value={formState.mission_statement}
           onChange={handleChange}
           placeholder="Opisz główne cele i misję organizacji..."
-          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+          className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5 resize-none"
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div>
+        <label htmlFor="professional_category" className="block text-xs font-medium text-gray-300 mb-0.5">
+          Kategoria wsparcia
+        </label>
+        <select
+          id="professional_category"
+          name="professional_category"
+          value={formState.professional_category}
+          onChange={handleChange}
+          required
+          className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
+        >
+          <option value="">Wybierz kategorię...</option>
+          <option value="humanitarian">Pomoc humanitarna</option>
+          <option value="food">Żywność/Gastronomia</option>
+          <option value="medical">Medycyna/Zdrowie</option>
+          <option value="ecology">Ekologia</option>
+          <option value="nature">Ochrona przyrody</option>
+          <option value="animals">Ochrona zwierząt</option>
+          <option value="education">Edukacja</option>
+          <option value="online_learning">Edukacja online</option>
+          <option value="pet_help">Pomoc dla zwierząt</option>
+          <option value="arts">Kultura i sztuka</option>
+          <option value="communication">Komunikacja</option>
+        </select>
+        <p className="mt-0.5 text-xs text-gray-400">
+          Ta kategoria pomoże nam dopasować odpowiednie ikony do Twojego profilu
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-2 sm:gap-3">
         <div>
-          <label htmlFor="address" className="block text-sm font-medium text-gray-300">
-            Adres Organizacji
+          <label htmlFor="address" className="block text-xs font-medium text-gray-300 mb-0.5">
+            Adres
           </label>
           <input
             type="text"
@@ -494,14 +546,14 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             onChange={handleChange}
             required
             placeholder="Ulica i numer"
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
         <div>
-          <label htmlFor="city" className="block text-sm font-medium text-gray-300">
+          <label htmlFor="city" className="block text-xs font-medium text-gray-300 mb-0.5">
             Miasto
           </label>
           <input
@@ -511,12 +563,12 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.city}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
           />
         </div>
         <div>
-          <label htmlFor="postal_code" className="block text-sm font-medium text-gray-300">
-            Kod Pocztowy
+          <label htmlFor="postal_code" className="block text-xs font-medium text-gray-300 mb-0.5">
+            Kod
           </label>
           <input
             type="text"
@@ -526,11 +578,11 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             onChange={handleChange}
             required
             placeholder="00-000"
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
           />
         </div>
-        <div>
-          <label htmlFor="country" className="block text-sm font-medium text-gray-300">
+        <div className="col-span-2 sm:col-span-1">
+          <label htmlFor="country" className="block text-xs font-medium text-gray-300 mb-0.5">
             Kraj
           </label>
           <input
@@ -541,19 +593,19 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             onChange={handleChange}
             required
             placeholder="Polska"
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
           />
         </div>
       </div>
-    </>
+    </div>
   );
 
   const renderCreatorFields = () => (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div>
-          <label htmlFor="first_name" className="block text-sm font-medium text-gray-300">
-            First Name
+          <label htmlFor="first_name" className="block text-xs sm:text-sm font-medium text-gray-300">
+            Imię
           </label>
           <input
             type="text"
@@ -562,12 +614,12 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.first_name}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
         </div>
         <div>
-          <label htmlFor="last_name" className="block text-sm font-medium text-gray-300">
-            Last Name
+          <label htmlFor="last_name" className="block text-xs sm:text-sm font-medium text-gray-300">
+            Nazwisko
           </label>
           <input
             type="text"
@@ -576,14 +628,14 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.last_name}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="professional_category" className="block text-sm font-medium text-gray-300">
-          Professional Category
+        <label htmlFor="professional_category" className="block text-xs sm:text-sm font-medium text-gray-300">
+          Kategoria wsparcia
         </label>
         <select
           id="professional_category"
@@ -591,25 +643,29 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           value={formState.professional_category}
           onChange={handleChange}
           required
-          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
         >
-          <option value="">Select category</option>
-          <option value="visual_artist">Visual Artist</option>
-          <option value="musician">Musician</option>
-          <option value="writer">Writer/Author</option>
-          <option value="podcaster">Podcaster</option>
-          <option value="videographer">Videographer</option>
-          <option value="streamer">Streamer</option>
-          <option value="influencer">Social Media Influencer</option>
-          <option value="educator">Educator/Teacher</option>
-          <option value="developer">Developer</option>
-          <option value="other">Other</option>
+          <option value="">Wybierz kategorię...</option>
+          <option value="humanitarian">Pomoc humanitarna</option>
+          <option value="food">Żywność/Gastronomia</option>
+          <option value="medical">Medycyna/Zdrowie</option>
+          <option value="ecology">Ekologia</option>
+          <option value="nature">Ochrona przyrody</option>
+          <option value="animals">Ochrona zwierząt</option>
+          <option value="education">Edukacja</option>
+          <option value="online_learning">Edukacja online</option>
+          <option value="pet_help">Pomoc dla zwierząt</option>
+          <option value="arts">Kultura i sztuka</option>
+          <option value="communication">Komunikacja</option>
         </select>
+        <p className="mt-1 text-xs text-gray-400">
+          Ta kategoria pomoże nam dopasować odpowiednie ikony do Twojego profilu
+        </p>
       </div>
 
       <div>
-        <label htmlFor="portfolio_url" className="block text-sm font-medium text-gray-300">
-          Portfolio or Website URL
+        <label htmlFor="portfolio_url" className="block text-xs sm:text-sm font-medium text-gray-300">
+          Adres portfolio/strony (opcjonalnie)
         </label>
         <input
           type="url"
@@ -617,14 +673,14 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           name="portfolio_url"
           value={formState.portfolio_url}
           onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
-          placeholder="https://your-portfolio.com"
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
+          placeholder="https://example.com"
         />
       </div>
 
       <div>
-        <label htmlFor="address" className="block text-sm font-medium text-gray-300">
-          Address
+        <label htmlFor="address" className="block text-xs sm:text-sm font-medium text-gray-300">
+          Adres
         </label>
         <input
           type="text"
@@ -633,14 +689,15 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           value={formState.address}
           onChange={handleChange}
           required
-          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+          placeholder="Ulica i numer"
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
         <div>
-          <label htmlFor="city" className="block text-sm font-medium text-gray-300">
-            City
+          <label htmlFor="city" className="block text-xs sm:text-sm font-medium text-gray-300">
+            Miasto
           </label>
           <input
             type="text"
@@ -649,12 +706,12 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.city}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
         </div>
         <div>
-          <label htmlFor="postal_code" className="block text-sm font-medium text-gray-300">
-            Postal Code
+          <label htmlFor="postal_code" className="block text-xs sm:text-sm font-medium text-gray-300">
+            Kod Pocztowy
           </label>
           <input
             type="text"
@@ -663,12 +720,13 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.postal_code}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            placeholder="00-000"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
         </div>
-        <div>
-          <label htmlFor="country" className="block text-sm font-medium text-gray-300">
-            Country
+        <div className="col-span-2 sm:col-span-1">
+          <label htmlFor="country" className="block text-xs sm:text-sm font-medium text-gray-300">
+            Kraj
           </label>
           <input
             type="text"
@@ -677,14 +735,15 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             value={formState.country}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+            placeholder="Polska"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="phone_number" className="block text-sm font-medium text-gray-300">
-          Phone Number
+        <label htmlFor="phone_number" className="block text-xs sm:text-sm font-medium text-gray-300">
+          Numer Telefonu
         </label>
         <input
           type="tel"
@@ -693,7 +752,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           value={formState.phone_number}
           onChange={handleChange}
           required
-          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           placeholder="+48 123 456 789"
         />
       </div>
@@ -701,15 +760,15 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
   );
 
   return (
-    <div className="max-w-3xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-4">
-        <p className="mt-1 text-gray-400">
+    <div className="max-w-3xl mx-auto py-2 px-3 sm:py-4 sm:px-4 lg:px-8">
+      <div className="text-center mb-3 sm:mb-4">
+        <p className="text-sm sm:text-base text-gray-400">
           Podaj swoje {accountType !== 'individual' ? 'dane organizacji' : 'dane osobowe'}
         </p>
       </div>
 
-      <div className="bg-white/5 backdrop-blur-sm shadow-sm rounded-lg p-4 md:p-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="bg-white/5 backdrop-blur-sm shadow-sm rounded-lg p-3 sm:p-4 md:p-6">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           {renderFormFields()}
 
           <div className="flex justify-center pt-2">
@@ -718,9 +777,9 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
               whileTap={{ scale: 0.98 }}
               disabled={loading}
               type="submit"
-              className="w-full md:w-auto px-6 py-2 rounded-md text-white font-medium flex items-center justify-center space-x-2 bg-[#FF9F2D] hover:bg-[#f39729] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 text-sm sm:text-base rounded-md text-white font-medium flex items-center justify-center space-x-2 bg-[#FF9F2D] hover:bg-[#f39729] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {loading && <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />}
               <span>{loading ? 'Zapisywanie...' : 'Zapisz i Kontynuuj'}</span>
             </motion.button>
           </div>
