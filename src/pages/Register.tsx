@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -66,8 +66,10 @@ export default function Register() {
     { text: "Przejrzystość, zaufanie i pozytywny wpływ - nasze podstawowe wartości.", author: "Fundacja IM" },
   ];
 
-  // Randomly select a quote
-  const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+  // Randomly select a quote once when component mounts
+  const randomQuote = useMemo(() => {
+    return quotes[Math.floor(Math.random() * quotes.length)];
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white flex flex-col">
