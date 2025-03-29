@@ -112,7 +112,7 @@ export default function CreatorProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-[#dcddd7] pt-16 flex flex-col">
+    <div className="min-h-screen bg-[#dcddd7] pt-8 md:pt-16 flex flex-col">
       <main className="flex-grow relative">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
@@ -124,7 +124,8 @@ export default function CreatorProfile() {
           
           <div className="flex flex-col md:flex-row gap-8">
 
-            <div className="w-full md:w-3/5 flex flex-col gap-8"> 
+            {/* Profile Info Column (Left on Desktop) */}
+            <div className="w-full md:w-3/5 flex flex-col gap-8 order-last md:order-none"> 
               <div className="bg-white border border-[#1a1a1a]/10 rounded-lg overflow-hidden">
                 <div className="p-6 flex flex-col items-center text-center sm:flex-row sm:items-start sm:text-left">
                   {profile.avatar_url ? (
@@ -268,7 +269,8 @@ export default function CreatorProfile() {
               </div>
             </div>
 
-            <div className="w-full md:w-2/5">
+            {/* Logo & Donation Column (Right on Desktop) */}
+            <div className="w-full md:w-2/5 order-first md:order-none">
               {/* Logo container with animated background and hover effect */}
               <motion.div
                 whileHover={{ scale: 1.03 }}

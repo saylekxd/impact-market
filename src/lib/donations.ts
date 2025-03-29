@@ -59,7 +59,9 @@ export const donations = {
          // If error is null but data.id is missing, RLS might be blocking the select('id').
          // Log the specific situation for debugging.
          console.error('Payment insert succeeded but failed to retrieve ID, possibly due to RLS SELECT policy for anon user.', { error });
-         throw new Error(error?.message || 'Nie udało się pobrać ID nowej płatności po jej utworzeniu.');
+         // Construct the error message without assuming error.message exists here.
+         const errMsg = 'Nie udało się pobrać ID nowej płatności po jej utworzeniu.' + (error ? ` (DB Error: ${error})` : '');
+         throw new Error(errMsg);
       }
 
       // Determine which payment processor to use
@@ -161,18 +163,22 @@ export const donations = {
    */
   async getTotalByCreatorId(creatorId: string): Promise<{ success: boolean; total?: number; error?: string }> {
     try {
-      const { data, error } = await supabase
-        .from('payments')
-        .select('amount')
-        .eq('creator_id', creatorId)
-        .eq('status', 'completed');
+      // Call the database function instead of selecting directly
+      const { data, error } = await supabase.rpc('get_total_donations_by_creator', {
+        creator_uuid: creatorId // Pass the creatorId as the argument
+      });
 
-      if (error) throw error;
+      if (error) {
+          console.error("Error calling get_total_donations_by_creator RPC:", error);
+          throw error; // Throw the error to be caught below
+      }
 
-      const total = (data || []).reduce((sum, payment) => sum + payment.amount, 0);
-      return { success: true, total };
+      // The data returned by the RPC function is the total sum directly
+      return { success: true, total: data ?? 0 }; // Use the returned data, default to 0 if null/undefined
+
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message :
+                           (typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string' ? error.message : 'Unknown RPC error');
       return {
         success: false,
         error: errorMessage || 'Wystąpił błąd podczas obliczania sumy wpłat',
