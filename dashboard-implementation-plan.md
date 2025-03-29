@@ -1,3 +1,12 @@
+# BUG / Things to fix
+
+- [ ] Fix onboarding - it should automatically select Icons
+- [ ] Fix banc account onboarding - it doesn't send data to DB and has broken UX, because the numbers are white and not readable on white background
+- [ ] Fix how user type price for each icon - it should be typed on keyboard and not selected as it is now, system should allow to type only numbers 
+- [ ] Make plan for creator page profile - it should be have nice, gamified design, with actual payment methods, and other stuff
+
+
+
 # Dashboard Enhancement Implementation Plan
 
 This document outlines the approach for implementing the enhanced dashboard features based on the sidebar navigation structure. Each section corresponds to a specific option in the Sidebar.tsx component.
