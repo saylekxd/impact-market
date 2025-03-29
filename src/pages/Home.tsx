@@ -3,7 +3,8 @@ import { PixelTrail } from "@/components/ui/pixel-trail"
 import { AnimatedBackground } from "@/components/ui/animated-background"
 import { MinimalFooter } from "@/components/ui/minimal-footer"
 import { useRef, useEffect } from "react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
+import { UsernameAvailabilityChecker } from "@/components/feature/username-availability-checker"
 
 const Home: React.FC = () => {
   const screenSize = useScreenSize()
@@ -112,10 +113,15 @@ const Home: React.FC = () => {
             }}
           />
 
-          <div className="justify-center items-center flex flex-col w-full h-full z-10 pointer-events-none space-y-4 md:space-y-12">
-            <h2 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tighter">
+          <div className="sticky top-0 justify-center items-center flex flex-col w-full h-screen z-10 pointer-events-none space-y-4 md:space-y-12 pt-16">
+            <div className="mb-12 pointer-events-auto">
+              <UsernameAvailabilityChecker />
+            </div>
+
+            <h2 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tight">
               Second Screen
             </h2>
+
             <p className="text-sm md:text-xl text-gray-400 max-w-md text-center px-4">
               Minimalistic design with a subtle accent.
             </p>

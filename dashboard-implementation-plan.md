@@ -1,11 +1,15 @@
 # BUG / Things to fix
 
 
-- [X] Fix banc account onboarding - it doesn't send data to DB and has broken UX, because the numbers are white and not readable on white background
-- [ ] Fix how user type price for each icon - it should be typed on keyboard and not selected as it is now, system should allow to type only numbers. Also fix onboarding form, because it shouldn't be allow to type inncorect data (as not correct phone number)
-- [ ] Make plan for creator page profile - it should be have nice, gamified design, with actual payment methods
-
-
+- [X] Add to every "dot" that is being created in @AnimatedBackground.tsx - a random Icon that we're already using in the project
+- [X] Add in the 1/4 of top "Second screen" of @Home.tsx form styled component where user can check if that creator name is available in the system
+- [ ] Fix Login / Register page on mobiles - it should be have responsive design
+- [ ] Fix place, where I click "Wypłać środki" in the @Dashboard.tsx to redirect me to /dashboard/withdraws and delete "Zobacz powiadomienia" section
+- [ ] Add to "Uzupełnienie profilu" (ProfileHeader.tsx) section in @Dashboard.tsx connection with inserting images from "Twój profil" section. It should be next step. 
+- [ ] In "Twój profil" in Dashboard.tsx add limiter to signs (max 250 sings?)
+- [ ] Fix bug that User can't delete image that he sent in "Twój profil" section
+- [ ] Add info in @Setting.tsx that this page is under construction and some of options may not work, exluding "Notifications"
+- [ ] Handle @PaymentSuccess.tsx in more responsive way, it should be modal and have some animation 
 
 # Dashboard Enhancement Implementation Plan
 
