@@ -32,7 +32,12 @@ export default function IconPreview({
   
   // Handle price input change
   const handlePriceInputChange = (tier: 'small' | 'medium' | 'large', e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value, 10);
+    // Allow only digits
+    const numericValue = e.target.value.replace(/\D/g, '');
+    // Treat empty string as 0, otherwise parse
+    const value = numericValue === '' ? 0 : parseInt(numericValue, 10);
+
+    // Ensure value is not NaN (although regex should prevent this)
     if (!isNaN(value)) {
       onPriceChange(tier, value);
     }
@@ -87,9 +92,11 @@ export default function IconPreview({
                 
                 <input
                   id={`${tier}-price`}
-                  type="number"
-                  min="1"
-                  value={priceConfig[`${tier}_coffee_amount`]}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="\d*"
+                  min="0"
+                  value={priceConfig[`${tier}_coffee_amount`] === 0 ? '' : priceConfig[`${tier}_coffee_amount`].toString()}
                   onChange={(e) => handlePriceInputChange(tier, e)}
                   className={`w-full px-3 py-2 text-sm text-center border rounded-md transition-all ${
                     currentTier === tier 

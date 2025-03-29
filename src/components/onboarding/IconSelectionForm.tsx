@@ -91,8 +91,13 @@ export default function IconSelectionForm({
 
   // Handle price change
   const handlePriceChange = (tier: 'small' | 'medium' | 'large', e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value, 10);
-    if (!isNaN(value) && value > 0) {
+    // Allow only digits
+    const numericValue = e.target.value.replace(/\D/g, '');
+    // Treat empty string as 0, otherwise parse
+    const value = numericValue === '' ? 0 : parseInt(numericValue, 10);
+
+    // Ensure value is not NaN
+    if (!isNaN(value)) {
       setIconConfig((prev) => ({
         ...prev,
         [`${tier}_coffee_amount`]: value,
@@ -110,21 +115,40 @@ export default function IconSelectionForm({
   const handleSubmit = async () => {
     if (!userId) return;
 
+    // --- Validation Start ---
+    const { small_coffee_amount, medium_coffee_amount, large_coffee_amount } = iconConfig;
+
+    if (small_coffee_amount <= 0 || medium_coffee_amount <= 0 || large_coffee_amount <= 0) {
+      toast.error('Kwoty wsparcia muszą być większe od zera.');
+      return;
+    }
+
+    if (small_coffee_amount >= medium_coffee_amount) {
+      toast.error('Mała kwota musi być mniejsza niż średnia kwota.');
+      return;
+    }
+
+    if (medium_coffee_amount >= large_coffee_amount) {
+      toast.error('Średnia kwota musi być mniejsza niż duża kwota.');
+      return;
+    }
+    // --- Validation End ---
+
     setLoading(true);
     try {
       const { error } = await supabase.from('profiles').update({
         small_icon: iconConfig.small_icon,
         medium_icon: iconConfig.medium_icon,
         large_icon: iconConfig.large_icon,
-        small_coffee_amount: iconConfig.small_coffee_amount,
-        medium_coffee_amount: iconConfig.medium_coffee_amount,
-        large_coffee_amount: iconConfig.large_coffee_amount,
+        small_coffee_amount: small_coffee_amount, // Use validated values
+        medium_coffee_amount: medium_coffee_amount, // Use validated values
+        large_coffee_amount: large_coffee_amount, // Use validated values
       }).eq('id', userId);
 
       if (error) throw error;
 
       toast.success('Ikony zostały pomyślnie zapisane');
-      onCompleted();
+      onCompleted(); // Only call onCompleted if validation passes and save succeeds
     } catch (error) {
       console.error('Error saving icons:', error);
       toast.error('Nie udało się zapisać wybranych ikon');
@@ -213,9 +237,11 @@ export default function IconSelectionForm({
                   </label>
                   <input
                     id={`${tier}-price`}
-                    type="number"
-                    min="1"
-                    value={iconConfig[`${tier}_coffee_amount`]}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="\d*"
+                    min="0"
+                    value={iconConfig[`${tier}_coffee_amount`] === 0 ? '' : iconConfig[`${tier}_coffee_amount`].toString()}
                     onChange={(e) => handlePriceChange(tier, e)}
                     className={`w-full px-2 py-1 text-xs border rounded-md bg-white/5 text-white ${
                       currentTier === tier
