@@ -3,7 +3,11 @@ import { usePayouts } from '../contexts/PayoutContext';
 import { toast } from 'react-hot-toast';
 import { Pencil } from 'lucide-react';
 
-export default function BankAccountForm() {
+export interface BankAccountFormProps {
+  onCompleted?: () => void;
+}
+
+export default function BankAccountForm({ onCompleted }: BankAccountFormProps) {
   const { bankAccount, saveBankAccount, loading: contextLoading } = usePayouts();
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -85,6 +89,9 @@ export default function BankAccountForm() {
       if (success) {
         setIsEditing(false);
         toast.success('Dane bankowe zostały zapisane.');
+        if (onCompleted) {
+          onCompleted();
+        }
       }
     } finally {
       setLoading(false);
@@ -157,7 +164,7 @@ export default function BankAccountForm() {
           required
           value={formData.account_number}
           onChange={handleInputChange}
-          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm ${
+          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm text-gray-900 ${
             errors.account_number ? 'border-red-300' : ''
           }`}
           placeholder="PL00 0000 0000 0000 0000 0000 0000"
@@ -178,7 +185,7 @@ export default function BankAccountForm() {
           required
           value={formData.bank_name}
           onChange={handleInputChange}
-          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm ${
+          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm text-gray-900 ${
             errors.bank_name ? 'border-red-300' : ''
           }`}
           placeholder="Nazwa banku"
@@ -199,7 +206,7 @@ export default function BankAccountForm() {
           required
           value={formData.swift_code}
           onChange={handleInputChange}
-          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm ${
+          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] sm:text-sm text-gray-900 ${
             errors.swift_code ? 'border-red-300' : ''
           }`}
           placeholder="BREXPLPWXXX"

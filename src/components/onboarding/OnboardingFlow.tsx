@@ -237,16 +237,8 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ userId }) => {
               </p>
             </div>
             <div className="bg-white/5 backdrop-blur-sm shadow-sm rounded-lg p-6 md:p-8">
-              <BankAccountForm />
+              <BankAccountForm onCompleted={handleBankAccountCompleted} />
               <div className="mt-8 flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleBankAccountCompleted}
-                  className="w-full md:w-auto px-8 py-3 rounded-md text-white font-medium bg-[#FF9F2D] hover:bg-[#f39729] transition-colors duration-200 flex items-center justify-center"
-                >
-                  Zapisz dane bankowe
-                </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
