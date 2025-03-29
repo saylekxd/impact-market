@@ -10,12 +10,32 @@ export interface PersonalDataFormProps {
   onCompleted: () => void;
 }
 
+// Define structure for errors
+interface FormErrors {
+  first_name?: string;
+  last_name?: string;
+  address?: string;
+  city?: string;
+  postal_code?: string;
+  country?: string;
+  phone_number?: string;
+  organization_name?: string;
+  tax_id?: string;
+  business_type?: string;
+  nonprofit_id?: string;
+  mission_statement?: string;
+  professional_category?: string;
+  portfolio_url?: string;
+  [key: string]: string | undefined; // Index signature
+}
+
 export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
   userId,
   accountType,
   onCompleted,
 }) => {
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
   const [formState, setFormState] = useState({
     // Common fields
     first_name: '',
@@ -43,10 +63,95 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
   };
+
+  // --- Validation Function ---
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+    let isValid = true;
+
+    // --- Polish Specific Regex ---
+    const phoneRegex = /^(?:\+48)?(?:[ -]?\d{3}){3}$|^\d{9}$/;
+    const postalCodeRegex = /^\d{2}-\d{3}$/;
+    const nipRegex = /^\d{10}$/;
+    const krsRegex = /^\d{10}$/; // KRS is also 10 digits
+
+    // Helper to clean NIP/KRS (remove spaces/hyphens)
+    const cleanNumber = (num: string) => num.replace(/[ -]/g, '');
+
+    // --- Common Validations ---
+    if (!formState.address) newErrors.address = 'Adres jest wymagany';
+    if (!formState.city) newErrors.city = 'Miasto jest wymagane';
+    if (!formState.country) newErrors.country = 'Kraj jest wymagany';
+    
+    if (!formState.postal_code) {
+      newErrors.postal_code = 'Kod pocztowy jest wymagany';
+    } else if (!postalCodeRegex.test(formState.postal_code)) {
+      newErrors.postal_code = 'Nieprawidłowy format kodu pocztowego (XX-XXX)';
+    }
+
+    if (!formState.phone_number) {
+      newErrors.phone_number = 'Numer telefonu jest wymagany';
+    } else if (!phoneRegex.test(formState.phone_number.replace(/[ +()-]/g, ''))) {
+      newErrors.phone_number = 'Nieprawidłowy format numeru telefonu (np. 123456789 lub +48 123 456 789)';
+    }
+
+    // --- Account Type Specific Validations ---
+    if (accountType === 'individual' || accountType === 'creator') {
+      if (!formState.first_name) newErrors.first_name = 'Imię jest wymagane';
+      if (!formState.last_name) newErrors.last_name = 'Nazwisko jest wymagane';
+    }
+
+    if (accountType === 'business' || accountType === 'nonprofit') {
+      if (!formState.organization_name) newErrors.organization_name = 'Nazwa organizacji jest wymagana';
+      if (!formState.tax_id) {
+        newErrors.tax_id = 'NIP jest wymagany';
+      } else {
+        const cleanedNip = cleanNumber(formState.tax_id);
+        if (!nipRegex.test(cleanedNip)) {
+          newErrors.tax_id = 'NIP musi składać się z 10 cyfr';
+        }
+      }
+    }
+
+    if (accountType === 'nonprofit') {
+      if (!formState.nonprofit_id) {
+        newErrors.nonprofit_id = 'KRS jest wymagany';
+      } else {
+        const cleanedKrs = cleanNumber(formState.nonprofit_id);
+        if (!krsRegex.test(cleanedKrs)) {
+          newErrors.nonprofit_id = 'KRS musi składać się z 10 cyfr';
+        }
+      }
+      if (!formState.mission_statement) newErrors.mission_statement = 'Misja organizacji jest wymagana';
+    }
+
+    if (accountType === 'creator' || accountType === 'individual') {
+      // Added 'individual' here as per field render logic
+      if (!formState.professional_category) newErrors.professional_category = 'Kategoria jest wymagana';
+    }
+    
+    //Check for any errors
+    isValid = Object.keys(newErrors).length === 0;
+
+    setErrors(newErrors);
+    return isValid;
+  };
+  // --- End Validation Function ---
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // --- Add validation call ---
+    if (!validateForm()) {
+      toast.error('Proszę poprawić błędy w formularzu.');
+      return;
+    }
+    // --- End validation call ---
+
     setLoading(true);
 
     try {
@@ -55,9 +160,17 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
         ...formState,
       };
 
+      // Filter out empty strings before upserting if necessary (optional)
+      const dataToUpsert = Object.entries(personalData).reduce((acc, [key, value]) => {
+        if (value !== '' && value !== null && value !== undefined) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as any);
+
       const { error } = await supabase.from('personal_data').upsert({
-        id: userId,
-        ...personalData,
+        id: userId, // Assuming user_id is the primary key for upsert
+        ...dataToUpsert,
       });
 
       if (error) throw error;
@@ -100,6 +213,14 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
     fetchExistingData();
   }, [userId]);
 
+  // --- Helper to Render Errors ---
+  const renderError = (fieldName: keyof FormErrors) => {
+    return errors[fieldName] ? (
+      <p className="mt-1 text-xs text-red-400">{errors[fieldName]}</p>
+    ) : null;
+  };
+  // --- End Helper ---
+
   // Render different forms based on account type
   const renderFormFields = () => {
     switch (accountType) {
@@ -132,6 +253,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             required
             className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
+          {renderError('first_name')}
         </div>
         <div>
           <label htmlFor="last_name" className="block text-xs sm:text-sm font-medium text-gray-300">
@@ -146,6 +268,174 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             required
             className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
+          {renderError('last_name')}
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="professional_category" className="block text-xs sm:text-sm font-medium text-gray-300">
+          Kategoria wsparcia
+        </label>
+        <select
+          id="professional_category"
+          name="professional_category"
+          value={formState.professional_category}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
+        >
+          <option value="">Wybierz kategorię...</option>
+          <option value="humanitarian">Pomoc humanitarna</option>
+          <option value="food">Żywność/Gastronomia</option>
+          <option value="medical">Medycyna/Zdrowie</option>
+          <option value="ecology">Ekologia</option>
+          <option value="nature">Ochrona przyrody</option>
+          <option value="animals">Ochrona zwierząt</option>
+          <option value="education">Edukacja</option>
+          <option value="online_learning">Edukacja online</option>
+          <option value="pet_help">Pomoc dla zwierząt</option>
+          <option value="arts">Kultura i sztuka</option>
+          <option value="communication">Komunikacja</option>
+        </select>
+        {renderError('professional_category')}
+        <p className="mt-1 text-xs text-gray-400">
+          Ta kategoria pomoże nam dopasować odpowiednie ikony do Twojego profilu
+        </p>
+      </div>
+
+      <div>
+        <label htmlFor="address" className="block text-xs sm:text-sm font-medium text-gray-300">
+          Adres
+        </label>
+        <input
+          type="text"
+          id="address"
+          name="address"
+          value={formState.address}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
+        />
+        {renderError('address')}
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div>
+          <label htmlFor="city" className="block text-xs sm:text-sm font-medium text-gray-300">
+            Miasto
+          </label>
+          <input
+            type="text"
+            id="city"
+            name="city"
+            value={formState.city}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
+          />
+          {renderError('city')}
+        </div>
+        <div>
+          <label htmlFor="postal_code" className="block text-xs sm:text-sm font-medium text-gray-300">
+            Kod Pocztowy
+          </label>
+          <input
+            type="text"
+            id="postal_code"
+            name="postal_code"
+            value={formState.postal_code}
+            onChange={handleChange}
+            required
+            placeholder="00-000"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
+          />
+          {renderError('postal_code')}
+        </div>
+        <div className="col-span-2 sm:col-span-1">
+          <label htmlFor="country" className="block text-xs sm:text-sm font-medium text-gray-300">
+            Kraj
+          </label>
+          <input
+            type="text"
+            id="country"
+            name="country"
+            value={formState.country}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
+          />
+          {renderError('country')}
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="phone_number" className="block text-xs sm:text-sm font-medium text-gray-300">
+          Numer Telefonu
+        </label>
+        <input
+          type="tel"
+          id="phone_number"
+          name="phone_number"
+          value={formState.phone_number}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
+          placeholder="+48 123 456 789"
+        />
+        {renderError('phone_number')}
+      </div>
+    </>
+  );
+
+  const renderBusinessFields = () => (
+    <>
+      <div>
+        <label htmlFor="organization_name" className="block text-xs sm:text-sm font-medium text-gray-300">
+          Nazwa Firmy
+        </label>
+        <input
+          type="text"
+          id="organization_name"
+          name="organization_name"
+          value={formState.organization_name}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
+        />
+        {renderError('organization_name')}
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        <div>
+          <label htmlFor="business_type" className="block text-xs sm:text-sm font-medium text-gray-300">
+            Typ Działalności
+          </label>
+          <input
+            type="text"
+            id="business_type"
+            name="business_type"
+            value={formState.business_type}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
+          />
+          {renderError('business_type')}
+        </div>
+        <div>
+          <label htmlFor="tax_id" className="block text-xs sm:text-sm font-medium text-gray-300">
+            NIP
+          </label>
+          <input
+            type="text"
+            id="tax_id"
+            name="tax_id"
+            value={formState.tax_id}
+            onChange={handleChange}
+            required
+            placeholder="1234567890"
+            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
+          />
+          {renderError('tax_id')}
         </div>
       </div>
 
@@ -190,165 +480,10 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           value={formState.address}
           onChange={handleChange}
           required
-          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
-        />
-      </div>
-
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-        <div>
-          <label htmlFor="city" className="block text-xs sm:text-sm font-medium text-gray-300">
-            Miasto
-          </label>
-          <input
-            type="text"
-            id="city"
-            name="city"
-            value={formState.city}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
-          />
-        </div>
-        <div>
-          <label htmlFor="postal_code" className="block text-xs sm:text-sm font-medium text-gray-300">
-            Kod Pocztowy
-          </label>
-          <input
-            type="text"
-            id="postal_code"
-            name="postal_code"
-            value={formState.postal_code}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
-          />
-        </div>
-        <div className="col-span-2 sm:col-span-1">
-          <label htmlFor="country" className="block text-xs sm:text-sm font-medium text-gray-300">
-            Kraj
-          </label>
-          <input
-            type="text"
-            id="country"
-            name="country"
-            value={formState.country}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label htmlFor="phone_number" className="block text-xs sm:text-sm font-medium text-gray-300">
-          Numer Telefonu
-        </label>
-        <input
-          type="tel"
-          id="phone_number"
-          name="phone_number"
-          value={formState.phone_number}
-          onChange={handleChange}
-          required
-          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
-          placeholder="+48 123 456 789"
-        />
-      </div>
-    </>
-  );
-
-  const renderBusinessFields = () => (
-    <>
-      <div>
-        <label htmlFor="organization_name" className="block text-xs sm:text-sm font-medium text-gray-300">
-          Nazwa Organizacji
-        </label>
-        <input
-          type="text"
-          id="organization_name"
-          name="organization_name"
-          value={formState.organization_name}
-          onChange={handleChange}
-          required
-          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-        <div>
-          <label htmlFor="business_type" className="block text-xs sm:text-sm font-medium text-gray-300">
-            Typ Działalności
-          </label>
-          <input
-            type="text"
-            id="business_type"
-            name="business_type"
-            value={formState.business_type}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
-          />
-        </div>
-        <div>
-          <label htmlFor="tax_id" className="block text-xs sm:text-sm font-medium text-gray-300">
-            NIP
-          </label>
-          <input
-            type="text"
-            id="tax_id"
-            name="tax_id"
-            value={formState.tax_id}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label htmlFor="professional_category" className="block text-xs sm:text-sm font-medium text-gray-300">
-          Kategoria wsparcia
-        </label>
-        <select
-          id="professional_category"
-          name="professional_category"
-          value={formState.professional_category}
-          onChange={handleChange}
-          required
-          className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
-        >
-          <option value="">Wybierz kategorię...</option>
-          <option value="humanitarian">Pomoc humanitarna</option>
-          <option value="food">Żywność/Gastronomia</option>
-          <option value="medical">Medycyna/Zdrowie</option>
-          <option value="ecology">Ekologia</option>
-          <option value="nature">Ochrona przyrody</option>
-          <option value="animals">Ochrona zwierząt</option>
-          <option value="education">Edukacja</option>
-          <option value="online_learning">Edukacja online</option>
-          <option value="pet_help">Pomoc dla zwierząt</option>
-          <option value="arts">Kultura i sztuka</option>
-          <option value="communication">Komunikacja</option>
-        </select>
-        <p className="mt-1 text-xs text-gray-400">
-          Ta kategoria pomoże nam dopasować odpowiednie ikony do Twojego profilu
-        </p>
-      </div>
-
-      <div>
-        <label htmlFor="address" className="block text-xs sm:text-sm font-medium text-gray-300">
-          Adres Firmy
-        </label>
-        <input
-          type="text"
-          id="address"
-          name="address"
-          value={formState.address}
-          onChange={handleChange}
-          required
           placeholder="Ulica i numer"
           className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
         />
+        {renderError('address')}
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
@@ -365,6 +500,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             required
             className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
+          {renderError('city')}
         </div>
         <div>
           <label htmlFor="postal_code" className="block text-xs sm:text-sm font-medium text-gray-300">
@@ -380,6 +516,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             placeholder="00-000"
             className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
+          {renderError('postal_code')}
         </div>
         <div className="col-span-2 sm:col-span-1">
           <label htmlFor="country" className="block text-xs sm:text-sm font-medium text-gray-300">
@@ -395,6 +532,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             placeholder="Polska"
             className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
+          {renderError('country')}
         </div>
       </div>
 
@@ -412,6 +550,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           placeholder="+48 123 456 789"
         />
+        {renderError('phone_number')}
       </div>
     </>
   );
@@ -432,6 +571,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             required
             className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
           />
+          {renderError('organization_name')}
         </div>
 
         <div>
@@ -469,6 +609,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             placeholder="0000000000"
             className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
           />
+          {renderError('nonprofit_id')}
         </div>
 
         <div>
@@ -501,6 +642,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           placeholder="Opisz główne cele i misję organizacji..."
           className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5 resize-none"
         />
+        {renderError('mission_statement')}
       </div>
 
       <div>
@@ -548,6 +690,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             placeholder="Ulica i numer"
             className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
           />
+          {renderError('address')}
         </div>
       </div>
 
@@ -565,6 +708,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             required
             className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
           />
+          {renderError('city')}
         </div>
         <div>
           <label htmlFor="postal_code" className="block text-xs font-medium text-gray-300 mb-0.5">
@@ -580,6 +724,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             placeholder="00-000"
             className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
           />
+          {renderError('postal_code')}
         </div>
         <div className="col-span-2 sm:col-span-1">
           <label htmlFor="country" className="block text-xs font-medium text-gray-300 mb-0.5">
@@ -595,6 +740,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             placeholder="Polska"
             className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
           />
+          {renderError('country')}
         </div>
       </div>
     </div>
@@ -616,6 +762,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             required
             className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
+          {renderError('first_name')}
         </div>
         <div>
           <label htmlFor="last_name" className="block text-xs sm:text-sm font-medium text-gray-300">
@@ -630,6 +777,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             required
             className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
+          {renderError('last_name')}
         </div>
       </div>
 
@@ -658,6 +806,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           <option value="arts">Kultura i sztuka</option>
           <option value="communication">Komunikacja</option>
         </select>
+        {renderError('professional_category')}
         <p className="mt-1 text-xs text-gray-400">
           Ta kategoria pomoże nam dopasować odpowiednie ikony do Twojego profilu
         </p>
@@ -676,6 +825,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           placeholder="https://example.com"
         />
+        {renderError('portfolio_url')}
       </div>
 
       <div>
@@ -692,6 +842,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           placeholder="Ulica i numer"
           className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
         />
+        {renderError('address')}
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
@@ -708,6 +859,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             required
             className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
+          {renderError('city')}
         </div>
         <div>
           <label htmlFor="postal_code" className="block text-xs sm:text-sm font-medium text-gray-300">
@@ -723,6 +875,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             placeholder="00-000"
             className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
+          {renderError('postal_code')}
         </div>
         <div className="col-span-2 sm:col-span-1">
           <label htmlFor="country" className="block text-xs sm:text-sm font-medium text-gray-300">
@@ -738,6 +891,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             placeholder="Polska"
             className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           />
+          {renderError('country')}
         </div>
       </div>
 
@@ -755,6 +909,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
           className="mt-1 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D]"
           placeholder="+48 123 456 789"
         />
+        {renderError('phone_number')}
       </div>
     </>
   );

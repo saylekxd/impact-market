@@ -41,30 +41,39 @@ export const donations = {
       };
 
       // Utwórz wpis w bazie danych
+      // We specify `select('id')` to only request the ID, potentially minimizing RLS issues.
+      // If this still fails for anon, we might need { returning: 'minimal' } on insert.
       const { data, error } = await supabase
         .from('payments')
         .insert({
           ...fullPayment,
           status: 'pending',
         })
-        .select()
+        .select('id') // <--- Request ONLY the ID
         .single();
 
       if (error) throw error;
-      if (!data) throw new Error('Nie udało się utworzyć płatności');
+      // data might be null if RLS prevents even selecting the ID, but error should be set.
+      // Check for data and data.id specifically.
+      if (!data?.id) {
+         // If error is null but data.id is missing, RLS might be blocking the select('id').
+         // Log the specific situation for debugging.
+         console.error('Payment insert succeeded but failed to retrieve ID, possibly due to RLS SELECT policy for anon user.', { error });
+         throw new Error(error?.message || 'Nie udało się pobrać ID nowej płatności po jej utworzeniu.');
+      }
 
       // Determine which payment processor to use
       let paymentResult;
       
       // Use Stripe as the default payment processor
-      if (!data.payment_type || data.payment_type === 'stripe') {
+      if (!fullPayment.payment_type || fullPayment.payment_type === 'stripe') {
         const checkoutResult = await createCheckoutSession(
           data.id,
-          data.amount,
+          fullPayment.amount,
           'PLN',
-          data.email,
-          data.name,
-          data.message
+          fullPayment.payer_email ?? undefined,
+          fullPayment.payer_name ?? undefined,
+          fullPayment.message ?? undefined
         );
         
         if (checkoutResult.error) {
@@ -74,7 +83,7 @@ export const donations = {
             .delete()
             .eq('id', data.id);
             
-          throw new Error(checkoutResult.error);
+          throw new Error(typeof checkoutResult.error === 'string' ? checkoutResult.error : 'Stripe Checkout Session Error');
         }
         
         paymentResult = {
@@ -84,7 +93,11 @@ export const donations = {
         };
       } else {
         // Fallback to the original payment system (P24)
-        paymentResult = await payments.initializeTransaction(data);
+        const paymentDataForP24 = {
+          ...fullPayment,
+          id: data.id
+        };
+        paymentResult = await payments.initializeTransaction(paymentDataForP24);
       }
       
       if (paymentResult.error) {
@@ -93,15 +106,28 @@ export const donations = {
 
       return {
         success: true,
-        data,
+        data: {
+          ...fullPayment,
+          id: data.id,
+          status: 'pending',
+        } as any,
         redirectUrl: paymentResult.data.redirectUrl,
       };
     } catch (error: unknown) {
       console.error('Payment creation error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      // Check if error is an object and has a message property
+      let errorMessage = 'Unknown error';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string') {
+        errorMessage = error.message; 
+      }
+      // Fallback message if needed
+      const finalErrorMessage = errorMessage || 'Wystąpił błąd podczas przetwarzania płatności';
+      
       return {
         success: false,
-        error: errorMessage || 'Wystąpił błąd podczas przetwarzania płatności',
+        error: finalErrorMessage,
       };
     }
   },

@@ -14,6 +14,23 @@ import ProfileStatistics from './dashboard/components/ProfileStatistics';
 import PersonalDataManagement from './dashboard/components/PersonalDataManagement';
 import { motion } from 'framer-motion';
 
+// Define a type matching the data structure passed from ProfileForm's onSubmit
+type FormSubmitData = {
+  display_name: string;
+  bio: string;
+  avatar_url: string;
+  organization_history?: string;
+  organization_mission?: string;
+  organization_photos?: string[];
+  small_coffee_amount: number;
+  medium_coffee_amount: number;
+  large_coffee_amount: number;
+  small_icon: string;
+  medium_icon: string;
+  large_icon: string;
+  social_links?: any; // Use a more specific type if available
+};
+
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -31,6 +48,9 @@ export default function Dashboard() {
     display_name: '',
     bio: '',
     avatar_url: '',
+    organization_history: '',
+    organization_mission: '',
+    organization_photos: [] as string[],
     small_coffee_amount: 500,
     medium_coffee_amount: 1000,
     large_coffee_amount: 2000,
@@ -57,16 +77,19 @@ export default function Dashboard() {
         if (profileResult.data) {
           setProfile(profileResult.data);
           setFormData({
-            display_name: profileResult.data?.display_name || '',
-            bio: profileResult.data?.bio || '',
-            avatar_url: profileResult.data?.avatar_url || '',
-            small_coffee_amount: profileResult.data?.small_coffee_amount || 500,
-            medium_coffee_amount: profileResult.data?.medium_coffee_amount || 1000,
-            large_coffee_amount: profileResult.data?.large_coffee_amount || 2000,
-            small_icon: profileResult.data?.small_icon || 'coffee',
-            medium_icon: profileResult.data?.medium_icon || 'coffee',
-            large_icon: profileResult.data?.large_icon || 'coffee',
-            social_links: profileResult.data?.social_links || {},
+            display_name: profileResult.data.display_name || '',
+            bio: profileResult.data.bio || '',
+            avatar_url: profileResult.data.avatar_url || '',
+            organization_history: profileResult.data.organization_history || '',
+            organization_mission: profileResult.data.organization_mission || '',
+            organization_photos: profileResult.data.organization_photos || [],
+            small_coffee_amount: profileResult.data.small_coffee_amount || 500,
+            medium_coffee_amount: profileResult.data.medium_coffee_amount || 1000,
+            large_coffee_amount: profileResult.data.large_coffee_amount || 2000,
+            small_icon: profileResult.data.small_icon || 'coffee',
+            medium_icon: profileResult.data.medium_icon || 'coffee',
+            large_icon: profileResult.data.large_icon || 'coffee',
+            social_links: profileResult.data.social_links || {},
           });
         }
 
@@ -108,36 +131,28 @@ export default function Dashboard() {
     loadData();
   }, [user, navigate, payments]);
 
-  const handleUpdateProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Modify handleUpdateProfile to accept the specific FormSubmitData type
+  const handleUpdateProfile = async (dataToSave: FormSubmitData) => {
     if (!user) return;
 
     try {
-      const updatedProfileData = {
-        display_name: formData.display_name,
-        bio: formData.bio,
-        avatar_url: formData.avatar_url,
-        small_coffee_amount: formData.small_coffee_amount,
-        medium_coffee_amount: formData.medium_coffee_amount,
-        large_coffee_amount: formData.large_coffee_amount,
-        small_icon: formData.small_icon,
-        medium_icon: formData.medium_icon,
-        large_icon: formData.large_icon,
-        social_links: formData.social_links,
-      };
+      console.log('Data received in handleUpdateProfile:', dataToSave); 
       
-      const result = await profiles.update(user.id, updatedProfileData);
+      // Use the received dataToSave object directly
+      const result = await profiles.update(user.id, dataToSave);
       
       if (result.success && result.data) {
         setProfile(result.data);
         setEditing(false);
         toast.success('Profil został zaktualizowany');
         
-        // Force the UI to refresh with the new data
         setFormData({
           display_name: result.data.display_name || '',
           bio: result.data.bio || '',
           avatar_url: result.data.avatar_url || '',
+          organization_history: result.data.organization_history || '',
+          organization_mission: result.data.organization_mission || '',
+          organization_photos: result.data.organization_photos || [],
           small_coffee_amount: result.data.small_coffee_amount || 500,
           medium_coffee_amount: result.data.medium_coffee_amount || 1000,
           large_coffee_amount: result.data.large_coffee_amount || 2000,
@@ -147,7 +162,7 @@ export default function Dashboard() {
           social_links: result.data.social_links || {},
         });
       } else {
-        throw new Error(result.error);
+        throw new Error(result.error || 'Nie udało się zapisać profilu');
       }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Błąd podczas aktualizacji profilu';
@@ -214,7 +229,7 @@ export default function Dashboard() {
               {editing ? (
                 <ProfileForm 
                   formData={formData}
-                  onChange={setFormData}
+                  onChange={(updatedFields) => setFormData(prev => ({ ...prev, ...updatedFields }))}
                   onSubmit={handleUpdateProfile}
                 />
               ) : (

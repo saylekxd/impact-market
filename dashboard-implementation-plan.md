@@ -1,9 +1,9 @@
 # BUG / Things to fix
 
-- [ ] Fix onboarding - it should automatically select Icons
-- [ ] Fix banc account onboarding - it doesn't send data to DB and has broken UX, because the numbers are white and not readable on white background
-- [ ] Fix how user type price for each icon - it should be typed on keyboard and not selected as it is now, system should allow to type only numbers 
-- [ ] Make plan for creator page profile - it should be have nice, gamified design, with actual payment methods, and other stuff
+
+- [X] Fix banc account onboarding - it doesn't send data to DB and has broken UX, because the numbers are white and not readable on white background
+- [ ] Fix how user type price for each icon - it should be typed on keyboard and not selected as it is now, system should allow to type only numbers. Also fix onboarding form, because it shouldn't be allow to type inncorect data (as not correct phone number)
+- [ ] Make plan for creator page profile - it should be have nice, gamified design, with actual payment methods
 
 
 
@@ -397,4 +397,11 @@ The payout system needs to be implemented with the following key components and 
    - [ ] Create user documentation and FAQs for payout process
    - [ ] Implement contextual help within the payout interface
 
-This implementation must comply with Polish financial regulations and ensure secure, reliable transfer of funds to creators while maintaining appropriate financial controls and audit capabilities. 
+This implementation must comply with Polish financial regulations and ensure secure, reliable transfer of funds to creators while maintaining appropriate financial controls and audit capabilities.
+
+## 8. Public Creator Profile (`/creator/:username`)
+
+- [ ] **Implement Donation Goal Display**
+  - Create `DonationGoalDisplay.tsx` component.
+  - Fetch active goal data in `CreatorProfile.tsx`.
+  - Conditionally render the component in the right column if a goal is active. 

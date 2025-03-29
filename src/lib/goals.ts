@@ -2,11 +2,14 @@ import { supabase } from './supabase';
 import { Database } from './database.types';
 import { v4 as uuidv4 } from 'uuid';
 
-type DonationGoal = Database['public']['Tables']['donation_goals']['Row'];
+// --- Export the Type --- 
+export type DonationGoal = Database['public']['Tables']['donation_goals']['Row'];
+// --- Keep other types internal if not needed elsewhere ---
 type DonationGoalInsert = Database['public']['Tables']['donation_goals']['Insert'];
 type DonationGoalUpdate = Database['public']['Tables']['donation_goals']['Update'];
 
-interface GoalResponse {
+// --- Export the Response Type --- 
+export interface GoalResponse {
   success: boolean;
   data?: DonationGoal | DonationGoal[] | null;
   error?: string;
@@ -36,6 +39,34 @@ export const goals = {
       };
     }
   },
+
+  // --- Add function to get the currently active goal --- 
+  async getActiveGoalByUserId(userId: string): Promise<GoalResponse> {
+    try {
+      const { data, error } = await supabase
+        .from('donation_goals')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('active', true) // Filter for active goals
+        .order('created_at', { ascending: false }) // Get the latest active one if multiple exist (shouldn't happen ideally)
+        .limit(1) // Only need one
+        .maybeSingle(); // Return null if no active goal found, instead of error
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data: data // data will be the goal object or null
+      };
+    } catch (error) {
+      console.error('Error fetching active goal:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
+      };
+    }
+  },
+  // --- End of new function ---
 
   // Create a new goal
   async create(goal: Omit<DonationGoalInsert, 'id'>): Promise<GoalResponse> {

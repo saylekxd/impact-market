@@ -19,6 +19,9 @@ export interface Database {
           medium_icon: string;
           large_icon: string;
           social_links: Record<string, string> | null;
+          organization_history: string | null;
+          organization_mission: string | null;
+          organization_photos: string[] | null;
         };
         Insert: {
           id: string;
@@ -37,6 +40,9 @@ export interface Database {
           medium_icon?: string;
           large_icon?: string;
           social_links?: Record<string, string> | null;
+          organization_history?: string | null;
+          organization_mission?: string | null;
+          organization_photos?: string[] | null;
         };
         Update: {
           id?: string;
@@ -55,6 +61,9 @@ export interface Database {
           medium_icon?: string;
           large_icon?: string;
           social_links?: Record<string, string> | null;
+          organization_history?: string | null;
+          organization_mission?: string | null;
+          organization_photos?: string[] | null;
         };
       };
       payments: {

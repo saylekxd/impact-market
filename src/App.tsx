@@ -31,10 +31,21 @@ function AppContent() {
   
   // Check if the current route is a dashboard route
   const isDashboardRoute = location.pathname.startsWith('/dashboard');
-  
-  // Only show header if user is not logged in or not on a dashboard page
-  // Also don't show header on onboarding page
-  const showHeader = !user || (!isDashboardRoute && !location.pathname.startsWith('/onboarding'));
+  // Check if the current route is a creator profile route
+  const isCreatorProfileRoute = location.pathname.startsWith('/creator/') || /^\/[^/]+$/.test(location.pathname); // Matches /:username
+  const isOnboardingRoute = location.pathname.startsWith('/onboarding');
+
+  // Determine if the header should be shown
+  let showHeader;
+  if (isCreatorProfileRoute) {
+    // Never show header on creator profile pages
+    showHeader = false;
+  } else {
+    // Original logic for other pages: 
+    // Show header if user is not logged in OR if they are logged in but
+    // NOT on dashboard or onboarding.
+    showHeader = !user || (user && !isDashboardRoute && !isOnboardingRoute);
+  }
   
   return (
     <div className="min-h-screen">
