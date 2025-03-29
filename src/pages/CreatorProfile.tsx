@@ -11,6 +11,7 @@ import DonationStripeForm from '../components/DonationStripeForm';
 import { Loader2, ImageOff, Globe, Instagram, Twitter, Facebook, Youtube } from 'lucide-react';
 import { AnimatedBackground } from "@/components/ui/animated-background";
 import { MinimalFooter } from "@/components/ui/minimal-footer";
+import { FallingIcons } from "@/components/ui/falling-icons";
 
 // Define a type for the icons map for better type safety
 type SocialIconMap = {
@@ -113,6 +114,13 @@ export default function CreatorProfile() {
 
   return (
     <div className="min-h-screen bg-[#dcddd7] pt-8 md:pt-16 flex flex-col">
+      <FallingIcons 
+        frequency={2500} // New dot every 2.5 seconds (slower)
+        minSize={48}     // Minimum size doubled from 24 to 48
+        maxSize={96}     // Maximum size doubled from 48 to 96
+        maxIcons={20}    // Double the maximum icons from 10 to 20
+      />
+      
       <main className="flex-grow relative">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
@@ -277,10 +285,10 @@ export default function CreatorProfile() {
                 transition={{ type: 'spring', stiffness: 300, damping: 15 }}
               >
                 <div className="bg-[#1a1a1a] rounded-lg px-6 py-4 mb-6 flex justify-center relative overflow-hidden">
-                  <AnimatedBackground className="absolute inset-0 opacity-20" />
+                  <AnimatedBackground className="absolute inset-0 opacity-30" />
                   <Link to="/" aria-label="Strona główna" className="relative z-10">
                     <img
-                      src="/path/to/your/logo.svg" // <-- Replace with actual logo path. Consider using a light version for dark background.
+                      src="/logo.png" // TODO: Replace with actual logo path
                       alt="Logo"
                       className="h-8 w-auto" // Adjust size as needed
                     />
