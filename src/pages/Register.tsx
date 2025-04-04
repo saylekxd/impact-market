@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { PixelTrail } from "@/components/ui/pixel-trail";
 import { useScreenSize } from "@/components/hooks/use-screen-size";
 import { motion } from "framer-motion";
 
@@ -74,13 +73,10 @@ export default function Register() {
   return (
     <div className="min-h-screen bg-[#1a1a1a] text-white flex flex-col">
       <div className="relative flex-grow flex flex-col md:flex-row">
+        {/* Background gradient */}
         <div className="absolute inset-0 z-0">
-          <PixelTrail
-            pixelSize={screenSize.lessThan("md") ? 36 : 60}
-            fadeDuration={0}
-            delay={1000}
-            pixelClassName="rounded-full bg-[#ffa04f]/20"
-          />
+          <div className="absolute -top-1/2 -left-1/4 w-96 h-96 bg-[#FF9F2D]/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#FF9F2D]/5 rounded-full blur-3xl"></div>
         </div>
         
         {/* Left side - Registration form */}

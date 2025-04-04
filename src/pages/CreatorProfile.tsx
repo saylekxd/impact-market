@@ -12,6 +12,7 @@ import { Loader2, ImageOff, Globe, Instagram, Twitter, Facebook, Youtube } from 
 import { AnimatedBackground } from "@/components/ui/animated-background";
 import { MinimalFooter } from "@/components/ui/minimal-footer";
 import { FallingIcons } from "@/components/ui/falling-icons";
+import Floating, { FloatingElement } from "@/components/ui/parallax-floating";
 
 // Define a type for the icons map for better type safety
 type SocialIconMap = {
@@ -114,11 +115,40 @@ export default function CreatorProfile() {
 
   return (
     <div className="min-h-screen bg-[#dcddd7] pt-8 md:pt-16 flex flex-col">
+      {profile.organization_photos && profile.organization_photos.length > 0 && (
+        <Floating sensitivity={-0.5} className="absolute inset-0 z-0 pointer-events-none">
+          {profile.organization_photos.slice(0, 3).map((photo, index) => (
+            <FloatingElement
+              key={index}
+              depth={0.5 + index * 0.5}
+              className={`
+                ${index === 0 ? 'top-[15%] left-[2%] md:top-[25%] md:left-[5%]' : ''}
+                ${index === 1 ? 'top-[0%] left-[8%] md:top-[6%] md:left-[11%]' : ''}
+                ${index === 2 ? 'top-[78%] left-[83%] md:top-[68%] md:left-[83%]' : ''}
+              `}
+            >
+              <motion.img
+                src={photo}
+                alt={`Floating image ${index + 1}`}
+                className={`
+                  object-cover hover:scale-105 duration-200 cursor-pointer transition-transform shadow-2xl rounded-xl
+                  ${index === 0 ? 'w-16 h-12 sm:w-24 sm:h-16 md:w-28 md:h-20 lg:w-32 lg:h-24 -rotate-[3deg]' : ''}
+                  ${index === 1 ? 'w-40 h-28 sm:w-48 sm:h-36 md:w-56 md:h-44 lg:w-60 lg:h-48 -rotate-12' : ''}
+                  ${index === 2 ? 'w-44 h-44 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 rotate-[19deg]' : ''}
+                `}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 + index * 0.2 }}
+              />
+            </FloatingElement>
+          ))}
+        </Floating>
+      )}
       <FallingIcons 
-        frequency={2500} // New dot every 2.5 seconds (slower)
-        minSize={48}     // Minimum size doubled from 24 to 48
-        maxSize={96}     // Maximum size doubled from 48 to 96
-        maxIcons={20}    // Double the maximum icons from 10 to 20
+        frequency={2500}
+        minSize={48}
+        maxSize={96}
+        maxIcons={20}
       />
       
       <main className="flex-grow relative">

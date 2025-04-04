@@ -1,16 +1,45 @@
-import { useScreenSize } from "@/components/hooks/use-screen-size"
-import { PixelTrail } from "@/components/ui/pixel-trail"
+
 import { AnimatedBackground } from "@/components/ui/animated-background"
 import { MinimalFooter } from "@/components/ui/minimal-footer"
 import { useRef, useEffect, useState } from "react"
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion"
+import { motion, LayoutGroup } from "framer-motion"
 import { UsernameAvailabilityChecker } from "@/components/feature/username-availability-checker"
 import { Safari } from "@/components/ui/safari"
 import { TextRotate } from "@/components/ui/text-rotate"
 import Floating, { FloatingElement } from "@/components/ui/parallax-floating"
+import { TestimonialsSection } from "@/components/ui/testimonials-section"
+
+const testimonials = [
+  {
+    author: {
+      name: "Emma Thompson",
+      handle: "@emmaai",
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face"
+    },
+    text: "Using this AI platform has transformed how we handle data analysis. The speed and accuracy are unprecedented.",
+    href: "https://twitter.com/emmaai"
+  },
+  {
+    author: {
+      name: "David Park",
+      handle: "@davidtech",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+    },
+    text: "The API integration is flawless. We've reduced our development time by 60% since implementing this solution.",
+    href: "https://twitter.com/davidtech"
+  },
+  {
+    author: {
+      name: "Sofia Rodriguez",
+      handle: "@sofiaml",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face"
+    },
+    text: "Finally, an AI tool that actually understands context! The accuracy in natural language processing is impressive."
+  }
+]
 
 const Home: React.FC = () => {
-  const screenSize = useScreenSize()
+  
   const secondSectionRef = useRef<HTMLDivElement>(null)
   const thirdSectionRef = useRef<HTMLDivElement>(null)
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
@@ -62,16 +91,10 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <div className="snap-y snap-mandatory h-screen overflow-y-auto">
+      <div className="snap-y snap-mandatory h-screen overflow-y-auto overflow-x-hidden">
         <div className="relative w-full h-screen bg-[#dcddd7] text-black flex flex-col snap-start">
-          <div className="absolute inset-0 z-0">
-            <PixelTrail
-              pixelSize={screenSize.lessThan("md") ? 48 : 80}
-              fadeDuration={0}
-              delay={1200}
-              pixelClassName="rounded-full bg-[#ffa04f]"
-            />
-          </div>
+          {/* Animated background */}
+          <AnimatedBackground className="absolute inset-0 z-0 opacity-50" />
 
           <Floating sensitivity={-0.5} className="absolute inset-0 z-10">
             <FloatingElement
@@ -117,9 +140,10 @@ const Home: React.FC = () => {
             </FloatingElement>
           </Floating>
 
-          <div className="justify-center items-center flex flex-col w-full h-full z-20 pointer-events-none space-y-2 md:space-y-8">
+          <div className="justify-between items-center flex flex-col w-full h-full z-20 pointer-events-none">
+            <div /> {/* Spacer */}
             <motion.h1
-              className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl text-center w-full justify-center items-center flex-col flex whitespace-pre leading-tight tracking-tight space-y-1 md:space-y-4"
+              className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl text-center w-full justify-center items-center flex-col flex whitespace-pre leading-tight tracking-tight space-y-1 md:space-y-4"
               animate={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.2, ease: "easeOut", delay: 0.3 }}
@@ -159,6 +183,18 @@ const Home: React.FC = () => {
                 </motion.span>
               </LayoutGroup>
             </motion.h1>
+
+            <motion.div
+              className="w-full pointer-events-auto mb-16"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut", delay: 0.8 }}
+            >
+              <TestimonialsSection
+                testimonials={testimonials}
+                className="bg-transparent"
+              />
+            </motion.div>
           </div>
 
           <motion.button
@@ -283,8 +319,126 @@ const Home: React.FC = () => {
             </p>
           </div>
 
+          {/* Grid Section */}
+          <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-24 space-y-24 md:space-y-48">
+            {/* First Grid Item */}
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1">
+                <img
+                  src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe"
+                  alt="Abstract Design"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="space-y-4 order-2">
+                <h3 className="text-2xl md:text-3xl font-medium tracking-tight">Innovative Design Solutions</h3>
+                <p className="text-base md:text-lg text-black/80 leading-relaxed">
+                  We craft experiences that merge aesthetics with functionality. Our approach combines modern design principles with cutting-edge technology to create interfaces that not only look beautiful but feel intuitive and engaging.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Second Grid Item */}
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1 md:order-2">
+                <img
+                  src="https://images.unsplash.com/photo-1633596683562-4a47eb4983c5"
+                  alt="Creative Visualization"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="space-y-4 order-2 md:order-1">
+                <h3 className="text-2xl md:text-3xl font-medium tracking-tight">Creative Excellence</h3>
+                <p className="text-base md:text-lg text-black/80 leading-relaxed">
+                  Every pixel matters in the digital landscape. We push boundaries to deliver experiences that captivate and inspire, ensuring your brand stands out in today's competitive digital environment.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Third Grid Item */}
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1">
+                <img
+                  src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4"
+                  alt="Modern Technology"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="space-y-4 order-2">
+                <h3 className="text-2xl md:text-3xl font-medium tracking-tight">Future-Forward Thinking</h3>
+                <p className="text-base md:text-lg text-black/80 leading-relaxed">
+                  We embrace emerging technologies and design trends to keep your digital presence ahead of the curve. Our solutions are built to evolve with your needs, ensuring long-term success in the digital space.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Fourth Grid Item */}
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1">
+                <img
+                  src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4"
+                  alt="Modern Technology"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="space-y-4 order-2">
+                <h3 className="text-2xl md:text-3xl font-medium tracking-tight">Future-Forward Thinking</h3>
+                <p className="text-base md:text-lg text-black/80 leading-relaxed">
+                  We embrace emerging technologies and design trends to keep your digital presence ahead of the curve. Our solutions are built to evolve with your needs, ensuring long-term success in the digital space.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Fifth Grid Item */}
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1 md:order-2">
+                <img
+                  src="https://images.unsplash.com/photo-1633596683562-4a47eb4983c5"
+                  alt="Creative Visualization"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="space-y-4 order-2 md:order-1">
+                <h3 className="text-2xl md:text-3xl font-medium tracking-tight">Creative Excellence</h3>
+                <p className="text-base md:text-lg text-black/80 leading-relaxed">
+                  Every pixel matters in the digital landscape. We push boundaries to deliver experiences that captivate and inspire, ensuring your brand stands out in today's competitive digital environment.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+
           <div className="relative w-full flex-1 flex flex-col justify-end">
-            <div className="relative w-full h-[100vh] bg-gradient-to-b from-[#dcddd7] via-[#dcddd7] to-[#1a1a1a]" />
+            <div className="relative w-full bg-gradient-to-b from-[#dcddd7] via-[#dcddd7] to-[#1a1a1a] py-12" />
             <MinimalFooter />
           </div>
         </div>

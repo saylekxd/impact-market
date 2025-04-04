@@ -16,6 +16,7 @@ export default {
         'ping-slower': 'ping 4s cubic-bezier(0, 0, 0.2, 1) infinite',
         'subtle-drift': 'drift 30s linear infinite',
         pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'marquee': 'marquee var(--duration) linear infinite',
       },
       keyframes: {
         float: {
@@ -34,6 +35,10 @@ export default {
         pulse: {
           '0%, 100%': { opacity: 1 },
           '50%': { opacity: .5 },
+        },
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(calc(-50%))' },
         },
       },
     },

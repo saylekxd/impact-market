@@ -27,20 +27,8 @@ export const MinimalHeader = () => {
         </div>
 
         <nav className="flex items-center space-x-8">
-          <motion.a
-            href="#"
-            className="text-sm text-gray-400 hover:text-white transition-colors"
-            whileHover={{ color: "#fff" }}
-          >
-            Work
-          </motion.a>
-          <motion.a
-            href="#"
-            className="text-sm text-gray-400 hover:text-white transition-colors"
-            whileHover={{ color: "#fff" }}
-          >
-            About
-          </motion.a>
+        
+          
           <div className="flex items-center space-x-4">
             <motion.a
               href="/login"
