@@ -3,6 +3,10 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        calendas: ['Calendas Plus', 'serif'],
+        overusedGrotesk: ['Overused Grotesk', 'sans-serif'],
+      },
       animation: {
         'float-slow': 'float 20s ease-in-out infinite',
         'float-medium': 'float 15s ease-in-out infinite',
@@ -14,7 +18,6 @@ export default {
         pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
-        
         float: {
           '0%, 100%': { transform: 'translateY(0) scale(1)' },
           '50%': { transform: 'translateY(-20px) scale(1.05)' },
@@ -23,7 +26,6 @@ export default {
           '0%, 100%': { transform: 'translateY(0) scale(1)' },
           '50%': { transform: 'translateY(20px) scale(0.95)' },
         },
-        
         drift: {
           '0%': { transform: 'translate(0, 0)' },
           '50%': { transform: 'translate(-10px, -10px)' },

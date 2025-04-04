@@ -66,19 +66,19 @@ export const UsernameAvailabilityChecker: React.FC = () => {
     }, []);
 
     return (
-        <>
-            <div className="relative w-80 mb-3"> 
+        <div className="w-full">
+            <div className="relative w-full mb-3">
                 <input
                     id="creatorNameInput"
                     type="text"
                     value={creatorName}
                     onChange={handleInputChange}
-                    placeholder="Sprawdź dostępność nazwy..."
-                    className="w-full rounded-full border border-gray-600 bg-[#2a2a2a] px-5 py-2.5 pr-10 text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ffa04f] focus:border-transparent"
+                    placeholder="Sprawdź dostępność nazwy..."
+                    className="w-full h-12 sm:h-14 md:h-16 rounded-full border border-gray-600 bg-[#2a2a2a] px-6 sm:px-8 text-base sm:text-lg md:text-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ffa04f] focus:border-transparent transition-all duration-200"
                 />
                 {availabilityStatus === "checking" && (
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                        <Loader2 className="h-5 w-5 text-gray-400 animate-spin" />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-6">
+                        <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-gray-400 animate-spin" />
                     </div>
                 )}
             </div>
@@ -91,16 +91,26 @@ export const UsernameAvailabilityChecker: React.FC = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.3 }}
-                        className={`mt-3 text-sm flex items-center justify-center space-x-1 ${availabilityStatus === "available" ? "text-green-400" : "text-red-400"}`}
+                        className={`mt-4 text-base sm:text-lg md:text-xl flex items-center justify-center space-x-3 ${
+                            availabilityStatus === "available" 
+                                ? "text-green-400" 
+                                : "text-red-400"
+                        }`}
                     >
                         {availabilityStatus === "available" ? (
-                            <><CheckCircle className="h-4 w-4" /> <span>Mamy to! Nazwa "{creatorName}" jest dostępne.</span></>
+                            <>
+                                <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />
+                                <span>Mamy to! Nazwa "{creatorName}" jest dostępne.</span>
+                            </>
                         ) : (
-                            <><XCircle className="h-4 w-4" /> <span>Sorry, Nazwa "{creatorName}" jest aktualnie zajęta.</span></>
+                            <>
+                                <XCircle className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8" />
+                                <span>Sorry, Nazwa "{creatorName}" jest aktualnie zajęta.</span>
+                            </>
                         )}
                     </motion.p>
                 )}
             </AnimatePresence>
-        </>
+        </div>
     );
 }; 

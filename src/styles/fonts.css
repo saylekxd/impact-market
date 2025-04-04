@@ -1,0 +1,17 @@
+@font-face {
+  font-family: 'Calendas Plus';
+  src: url('/fonts/calendas-plus-regular.woff2') format('woff2'),
+       url('/fonts/calendas-plus-regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Overused Grotesk';
+  src: url('/fonts/overused-grotesk-regular.woff2') format('woff2'),
+       url('/fonts/overused-grotesk-regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+} 
