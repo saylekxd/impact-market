@@ -95,7 +95,7 @@ export default function Login() {
         </div>
         
         {/* Left side - Login form */}
-        <div className="w-full md:w-1/2 flex justify-center items-center p-6 z-10">
+        <div className="w-full md:w-1/2 flex justify-center items-center p-6 z-10 min-h-screen md:min-h-0">
           <div className="w-full max-w-md">
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
