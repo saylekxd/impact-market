@@ -23,21 +23,21 @@ export const MinimalFooter = () => {
               whileHover={{ color: "#fff" }}
               className="hover:text-white transition-colors"
             >
-              Twitter
+              Facebook
             </motion.a>
             <motion.a
               href="#"
               whileHover={{ color: "#fff" }}
               className="hover:text-white transition-colors"
             >
-              GitHub
+              Regulamin
             </motion.a>
             <motion.a
               href="#"
               whileHover={{ color: "#fff" }}
               className="hover:text-white transition-colors"
             >
-              Email
+              Polityka prywatności
             </motion.a>
           </nav>
           <motion.div
@@ -54,8 +54,24 @@ export const MinimalFooter = () => {
             }}
           />
         </div>
+        <div className="flex items-center gap-2 mb-4 text-gray-400 text-sm">
+          <span>Developed by</span>
+          <motion.a
+            href="https://www.swtlabs.pl"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="opacity-70 hover:opacity-100 transition-opacity"
+            whileHover={{ scale: 1.05 }}
+          >
+            <img
+              src="/swtlabs-logo.png"
+              alt="SWTLabs"
+              className="h-6 w-auto"
+            />
+          </motion.a>
+        </div>
         <p className="text-xs text-gray-500 pb-6">
-          © 2024 Your Company. All rights reserved.
+          © 2025 Impactmartket.pl. Wszystkie prawa zastrzeżone.
         </p>
       </div>
     </footer>

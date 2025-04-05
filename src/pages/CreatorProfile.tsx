@@ -318,9 +318,9 @@ export default function CreatorProfile() {
                   <AnimatedBackground className="absolute inset-0 opacity-30" />
                   <Link to="/" aria-label="Strona główna" className="relative z-10">
                     <img
-                      src="/logo.png" // TODO: Replace with actual logo path
-                      alt="Logo"
-                      className="h-8 w-auto" // Adjust size as needed
+                      src="/Impact-logo.svg"
+                      alt="Impact Logo"
+                      className="h-8 w-auto"
                     />
                   </Link>
                 </div>

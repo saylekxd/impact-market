@@ -51,9 +51,11 @@ const Home: React.FC = () => {
   ]
 
   const safariPreviewPhotos = [
-    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//SAFARI1.webp",
-    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//SAFARI2.webp",
-    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//SAFARI3.webp"
+    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//FIRSTIMG1.webp",
+    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//imgmain4.webp",
+    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//imgmain2.webp",
+    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//imgmain3.webp"
+    
   ]
 
   const scrollToSecond = () => {
@@ -113,51 +115,54 @@ const Home: React.FC = () => {
           <Floating sensitivity={-0.5} className="absolute inset-0 z-10">
             <FloatingElement
               depth={0.5}
-              className="top-[15%] left-[2%] md:top-[25%] md:left-[5%]"
+              className="top-[25%] left-[5%] sm:top-[25%] sm:left-[5%] md:top-[25%] md:left-[5%]"
             >
               <motion.img
                 src={photos[0]}
                 alt="Floating image 1"
-                className="w-16 h-12 sm:w-24 sm:h-16 md:w-28 md:h-20 lg:w-48 lg:h-36 object-cover hover:scale-105 duration-200 cursor-pointer transition-transform -rotate-[3deg] shadow-2xl rounded-xl"
+                className="w-20 h-16 sm:w-24 sm:h-20 md:w-32 md:h-24 lg:w-48 lg:h-36 object-cover hover:scale-105 duration-200 cursor-pointer transition-transform -rotate-[3deg] shadow-2xl rounded-xl"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
+                loading="lazy"
               />
             </FloatingElement>
 
             <FloatingElement
               depth={1}
-              className="top-[0%] left-[8%] md:top-[6%] md:left-[11%]"
+              className="top-[8%] right-[5%] sm:top-[10%] sm:right-[8%] md:top-[12%] md:right-[10%]"
             >
               <motion.img
                 src={photos[1]}
                 alt="Floating image 2"
-                className="w-40 h-28 sm:w-48 sm:h-36 md:w-56 md:h-44 lg:w-96 lg:h-72 object-cover hover:scale-105 duration-200 cursor-pointer transition-transform -rotate-12 shadow-2xl rounded-xl"
+                className="w-32 h-24 sm:w-40 sm:h-32 md:w-48 md:h-40 lg:w-96 lg:h-72 object-cover hover:scale-105 duration-200 cursor-pointer transition-transform rotate-6 shadow-2xl rounded-xl"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
+                loading="lazy"
               />
             </FloatingElement>
 
             <FloatingElement
               depth={2}
-              className="top-[78%] left-[83%] md:top-[68%] md:left-[83%]"
+              className="bottom-[15%] right-[8%] sm:bottom-[20%] sm:right-[10%] md:bottom-[25%] md:right-[15%]"
             >
               <motion.img
                 src={photos[2]}
                 alt="Floating image 3"
-                className="w-44 h-44 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-[30rem] lg:h-[30rem] object-cover hover:scale-105 duration-200 cursor-pointer transition-transform shadow-2xl rotate-[19deg] rounded-xl"
+                className="w-36 h-36 sm:w-48 sm:h-48 md:w-64 md:h-64 lg:w-[30rem] lg:h-[30rem] object-cover hover:scale-105 duration-200 cursor-pointer transition-transform shadow-2xl rotate-[12deg] rounded-xl"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.3 }}
+                loading="lazy"
               />
             </FloatingElement>
           </Floating>
 
           <div className="justify-between items-center flex flex-col w-full h-full z-20 pointer-events-none">
-            <div /> {/* Spacer */}
+            <div className="flex-1 min-h-[15vh]" /> {/* Adjusted spacer */}
             <motion.h1
-              className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl text-center w-full justify-center items-center flex-col flex whitespace-pre leading-tight tracking-tight space-y-1 md:space-y-4"
+              className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl text-center w-full justify-center items-center flex-col flex whitespace-pre leading-tight tracking-tight space-y-1 md:space-y-4 mb-12 md:mb-16" /* Added margin bottom */
               animate={{ opacity: 1, y: 0 }}
               initial={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.2, ease: "easeOut", delay: 0.3 }}
@@ -188,7 +193,7 @@ const Home: React.FC = () => {
                       "dla innych ✨",
                       "z nami 🤗",
                     ]}
-                    mainClassName="overflow-hidden pr-3 text-[#0015ff] py-0 pb-2 md:pb-4 rounded-xl"
+                    mainClassName="overflow-hidden pr-3 text-[rgb(255,160,79)] py-0 pb-2 md:pb-4 rounded-xl"
                     staggerDuration={0.03}
                     staggerFrom="last"
                     rotationInterval={3000}
@@ -238,8 +243,8 @@ const Home: React.FC = () => {
             </svg>
           </motion.button>
 
-          <p className="absolute text-xs md:text-base bottom-4 right-4 pointer-events-none">
-            make the web fun again.
+          <p className="absolute text-xs md:text-base bottom-4 right-4 pointer-events-none hidden md:block">
+            Nowoczesne darowizny dla dobra innych.
           </p>
         </div>
 
@@ -279,7 +284,7 @@ const Home: React.FC = () => {
 
               <div className="w-full flex flex-col items-center justify-center gap-4">
                 <p className="text-sm md:text-xl text-gray-400 text-center">
-                  Innowacyjna platforma łącząca technologię z działaniami charytatywnymi.
+                Masz pomysł? Zobacz, czy Twoja nazwa jest dostępna!
                 </p>
                 
                 <div className="w-full max-w-[400px] sm:max-w-[480px] md:max-w-[560px] px-4 sm:px-6 md:px-8">
@@ -345,7 +350,7 @@ const Home: React.FC = () => {
             >
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1">
                 <img
-                  src="/images/profile-preview.jpg"
+                  src="src/images/GRID1.webp"
                   alt="Profile System"
                   className="w-full h-full object-cover"
                 />
@@ -368,7 +373,7 @@ const Home: React.FC = () => {
             >
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1 md:order-2">
                 <img
-                  src="/images/payment-system.jpg"
+                  src="src/images/GRID2.webp"
                   alt="Payment System"
                   className="w-full h-full object-cover"
                 />
@@ -391,7 +396,7 @@ const Home: React.FC = () => {
             >
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1">
                 <img
-                  src="/images/admin-panel.jpg"
+                  src="src/images/GRID3.webp"
                   alt="Admin Panel"
                   className="w-full h-full object-cover"
                 />
