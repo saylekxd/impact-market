@@ -55,5 +55,24 @@ export default defineConfig({
     reportCompressedSize: false,
     // Reduce file system load during build
     emptyOutDir: true,
+    // Increase the warning limit for chunk sizes
+    chunkSizeWarningLimit: 1000,
+    // Configure Rollup for better code splitting
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          // Vendor chunk for major dependencies
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+              return 'vendor';
+            }
+            if (id.includes('@radix-ui') || id.includes('@shadcn') || id.includes('lucide-react')) {
+              return 'ui';
+            }
+            return 'deps'; // Other dependencies
+          }
+        }
+      }
+    }
   },
 });
