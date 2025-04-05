@@ -613,6 +613,25 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
         </div>
 
         <div>
+          <label htmlFor="tax_id" className="block text-xs font-medium text-gray-300 mb-0.5">
+            NIP
+          </label>
+          <input
+            type="text"
+            id="tax_id"
+            name="tax_id"
+            value={formState.tax_id}
+            onChange={handleChange}
+            required
+            placeholder="1234567890"
+            className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
+          />
+          {renderError('tax_id')}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+        <div>
           <label htmlFor="phone_number" className="block text-xs font-medium text-gray-300 mb-0.5">
             Telefon
           </label>
@@ -626,6 +645,7 @@ export const PersonalDataForm: React.FC<PersonalDataFormProps> = ({
             className="mt-0.5 block w-full rounded-md border-gray-300/20 bg-white/5 text-white text-sm shadow-sm focus:border-[#FF9F2D] focus:ring-[#FF9F2D] py-1.5"
             placeholder="+48 123 456 789"
           />
+          {renderError('phone_number')}
         </div>
       </div>
 

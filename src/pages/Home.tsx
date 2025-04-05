@@ -1,4 +1,3 @@
-
 import { AnimatedBackground } from "@/components/ui/animated-background"
 import { MinimalFooter } from "@/components/ui/minimal-footer"
 import { useRef, useEffect, useState } from "react"
@@ -12,29 +11,29 @@ import { TestimonialsSection } from "@/components/ui/testimonials-section"
 const testimonials = [
   {
     author: {
-      name: "Emma Thompson",
-      handle: "@emmaai",
+      name: "Anna Kowalska",
+      handle: "@annahelps",
       avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face"
     },
-    text: "Using this AI platform has transformed how we handle data analysis. The speed and accuracy are unprecedented.",
-    href: "https://twitter.com/emmaai"
+    text: "Impact Market pomógł nam zebrać fundusze na nowy sprzęt rehabilitacyjny. Platforma jest intuicyjna i profesjonalna.",
+    href: "https://twitter.com/annahelps"
   },
   {
     author: {
-      name: "David Park",
-      handle: "@davidtech",
+      name: "Marek Nowak",
+      handle: "@mareknowak",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
     },
-    text: "The API integration is flawless. We've reduced our development time by 60% since implementing this solution.",
-    href: "https://twitter.com/davidtech"
+    text: "Dzięki systemowi subskrypcji możemy regularnie wspierać wybrane organizacje. To rewolucja w crowdfundingu!",
+    href: "https://twitter.com/mareknowak"
   },
   {
     author: {
-      name: "Sofia Rodriguez",
-      handle: "@sofiaml",
+      name: "Karolina Wiśniewska",
+      handle: "@karolinaw",
       avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face"
     },
-    text: "Finally, an AI tool that actually understands context! The accuracy in natural language processing is impressive."
+    text: "Bezpieczne płatności i przejrzyste raporty to dokładnie to, czego potrzebowaliśmy do naszych zbiórek charytatywnych."
   }
 ]
 
@@ -43,11 +42,18 @@ const Home: React.FC = () => {
   const secondSectionRef = useRef<HTMLDivElement>(null)
   const thirdSectionRef = useRef<HTMLDivElement>(null)
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
+  const [currentSafariPhotoIndex, setCurrentSafariPhotoIndex] = useState(0)
 
   const photos = [
-    "https://images.unsplash.com/photo-1682687982501-1e58ab814714",
-    "https://images.unsplash.com/photo-1682687218147-9806132dc697",
-    "https://images.unsplash.com/photo-1682695796497-31a44224d6d6"
+    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//MAIN1.webp",
+    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//MAIN2.webp",
+    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//MAIN3.webp"
+  ]
+
+  const safariPreviewPhotos = [
+    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//SAFARI1.webp",
+    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//SAFARI2.webp",
+    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//SAFARI3.webp"
   ]
 
   const scrollToSecond = () => {
@@ -89,6 +95,14 @@ const Home: React.FC = () => {
     return () => clearInterval(interval)
   }, [])
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSafariPhotoIndex((prev) => (prev + 1) % safariPreviewPhotos.length)
+    }, 7000)
+
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <>
       <div className="snap-y snap-mandatory h-screen overflow-y-auto overflow-x-hidden">
@@ -104,7 +118,7 @@ const Home: React.FC = () => {
               <motion.img
                 src={photos[0]}
                 alt="Floating image 1"
-                className="w-16 h-12 sm:w-24 sm:h-16 md:w-28 md:h-20 lg:w-32 lg:h-24 object-cover hover:scale-105 duration-200 cursor-pointer transition-transform -rotate-[3deg] shadow-2xl rounded-xl"
+                className="w-16 h-12 sm:w-24 sm:h-16 md:w-28 md:h-20 lg:w-48 lg:h-36 object-cover hover:scale-105 duration-200 cursor-pointer transition-transform -rotate-[3deg] shadow-2xl rounded-xl"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
@@ -118,7 +132,7 @@ const Home: React.FC = () => {
               <motion.img
                 src={photos[1]}
                 alt="Floating image 2"
-                className="w-40 h-28 sm:w-48 sm:h-36 md:w-56 md:h-44 lg:w-60 lg:h-48 object-cover hover:scale-105 duration-200 cursor-pointer transition-transform -rotate-12 shadow-2xl rounded-xl"
+                className="w-40 h-28 sm:w-48 sm:h-36 md:w-56 md:h-44 lg:w-96 lg:h-72 object-cover hover:scale-105 duration-200 cursor-pointer transition-transform -rotate-12 shadow-2xl rounded-xl"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
@@ -132,7 +146,7 @@ const Home: React.FC = () => {
               <motion.img
                 src={photos[2]}
                 alt="Floating image 3"
-                className="w-44 h-44 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 object-cover hover:scale-105 duration-200 cursor-pointer transition-transform shadow-2xl rotate-[19deg] rounded-xl"
+                className="w-44 h-44 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-[30rem] lg:h-[30rem] object-cover hover:scale-105 duration-200 cursor-pointer transition-transform shadow-2xl rotate-[19deg] rounded-xl"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.3 }}
@@ -148,7 +162,7 @@ const Home: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.2, ease: "easeOut", delay: 0.3 }}
             >
-              <span>Make your </span>
+              <span>Wspieraj </span>
               <LayoutGroup>
                 <motion.span layout className="flex whitespace-pre">
                   <motion.span
@@ -156,23 +170,23 @@ const Home: React.FC = () => {
                     className="flex whitespace-pre"
                     transition={{ type: "spring", damping: 30, stiffness: 400 }}
                   >
-                    website{" "}
+                    dobro{" "}
                   </motion.span>
                   <TextRotate
                     texts={[
-                      "fancy",
-                      "fun",
-                      "lovely ♥",
-                      "weird",
-                      "🪩 funky",
-                      "💃🕺",
-                      "sexy",
-                      "🕶️ cool",
-                      "go 🚀",
-                      "🔥🔥🔥",
-                      "over-animated?",
-                      "pop ✨",
-                      "rock 🤘",
+                      "skutecznie",
+                      "bezpiecznie",
+                      "z sercem ♥",
+                      "regularnie",
+                      "🤝 razem",
+                      "💝",
+                      "świadomie",
+                      "🌟 mądrze",
+                      "teraz 🚀",
+                      "❤️",
+                      "z pasją",
+                      "dla innych ✨",
+                      "z nami 🤗",
                     ]}
                     mainClassName="overflow-hidden pr-3 text-[#0015ff] py-0 pb-2 md:pb-4 rounded-xl"
                     staggerDuration={0.03}
@@ -256,8 +270,8 @@ const Home: React.FC = () => {
                   transition={{ duration: 0.5 }}
                 >
                   <Safari
-                    url="fancy-components.dev"
-                    src={photos[currentPhotoIndex]}
+                    url="impactmarket.pl"
+                    src={safariPreviewPhotos[currentSafariPhotoIndex]}
                     className="w-full h-auto transform scale-[0.85] sm:scale-90 md:scale-95 lg:scale-100"
                   />
                 </motion.div>
@@ -265,7 +279,7 @@ const Home: React.FC = () => {
 
               <div className="w-full flex flex-col items-center justify-center gap-4">
                 <p className="text-sm md:text-xl text-gray-400 text-center">
-                  Minimalistic design with a subtle accent.
+                  Innowacyjna platforma łącząca technologię z działaniami charytatywnymi.
                 </p>
                 
                 <div className="w-full max-w-[400px] sm:max-w-[480px] md:max-w-[560px] px-4 sm:px-6 md:px-8">
@@ -312,10 +326,10 @@ const Home: React.FC = () => {
 
           <div className="sticky top-0 justify-center items-center flex flex-col w-full h-screen z-10 pointer-events-none space-y-4 md:space-y-12 pt-16">
             <h2 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tight">
-              Third Screen
+              Jak to działa?
             </h2>
             <p className="text-sm md:text-xl max-w-md text-center px-4">
-              Featuring an automatically animated background pattern.
+              Poznaj innowacyjny system wsparcia organizacji non-profit.
             </p>
           </div>
 
@@ -331,15 +345,15 @@ const Home: React.FC = () => {
             >
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1">
                 <img
-                  src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe"
-                  alt="Abstract Design"
+                  src="/images/profile-preview.jpg"
+                  alt="Profile System"
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="space-y-4 order-2">
-                <h3 className="text-2xl md:text-3xl font-medium tracking-tight">Innovative Design Solutions</h3>
+                <h3 className="text-2xl md:text-3xl font-medium tracking-tight">System wsparcia twórców</h3>
                 <p className="text-base md:text-lg text-black/80 leading-relaxed">
-                  We craft experiences that merge aesthetics with functionality. Our approach combines modern design principles with cutting-edge technology to create interfaces that not only look beautiful but feel intuitive and engaging.
+                  Twórz profile, przyjmuj wpłaty i buduj społeczność wokół swoich działań charytatywnych. Nasz system umożliwia śledzenie historii transakcji i zarządzanie subskrypcjami cyklicznymi.
                 </p>
               </div>
             </motion.div>
@@ -354,15 +368,15 @@ const Home: React.FC = () => {
             >
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1 md:order-2">
                 <img
-                  src="https://images.unsplash.com/photo-1633596683562-4a47eb4983c5"
-                  alt="Creative Visualization"
+                  src="/images/payment-system.jpg"
+                  alt="Payment System"
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="space-y-4 order-2 md:order-1">
-                <h3 className="text-2xl md:text-3xl font-medium tracking-tight">Creative Excellence</h3>
+                <h3 className="text-2xl md:text-3xl font-medium tracking-tight">Bezpieczne płatności</h3>
                 <p className="text-base md:text-lg text-black/80 leading-relaxed">
-                  Every pixel matters in the digital landscape. We push boundaries to deliver experiences that captivate and inspire, ensuring your brand stands out in today's competitive digital environment.
+                  Zintegrowany system płatności obsługujący BLIK, karty płatnicze i przelewy tradycyjne. Automatyczne generowanie potwierdzeń i pełna transparentność transakcji.
                 </p>
               </div>
             </motion.div>
@@ -377,61 +391,15 @@ const Home: React.FC = () => {
             >
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1">
                 <img
-                  src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4"
-                  alt="Modern Technology"
+                  src="/images/admin-panel.jpg"
+                  alt="Admin Panel"
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="space-y-4 order-2">
-                <h3 className="text-2xl md:text-3xl font-medium tracking-tight">Future-Forward Thinking</h3>
+                <h3 className="text-2xl md:text-3xl font-medium tracking-tight">Panel administracyjny</h3>
                 <p className="text-base md:text-lg text-black/80 leading-relaxed">
-                  We embrace emerging technologies and design trends to keep your digital presence ahead of the curve. Our solutions are built to evolve with your needs, ensuring long-term success in the digital space.
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Fourth Grid Item */}
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1">
-                <img
-                  src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4"
-                  alt="Modern Technology"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="space-y-4 order-2">
-                <h3 className="text-2xl md:text-3xl font-medium tracking-tight">Future-Forward Thinking</h3>
-                <p className="text-base md:text-lg text-black/80 leading-relaxed">
-                  We embrace emerging technologies and design trends to keep your digital presence ahead of the curve. Our solutions are built to evolve with your needs, ensuring long-term success in the digital space.
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Fifth Grid Item */}
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1 md:order-2">
-                <img
-                  src="https://images.unsplash.com/photo-1633596683562-4a47eb4983c5"
-                  alt="Creative Visualization"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="space-y-4 order-2 md:order-1">
-                <h3 className="text-2xl md:text-3xl font-medium tracking-tight">Creative Excellence</h3>
-                <p className="text-base md:text-lg text-black/80 leading-relaxed">
-                  Every pixel matters in the digital landscape. We push boundaries to deliver experiences that captivate and inspire, ensuring your brand stands out in today's competitive digital environment.
+                  Zaawansowane narzędzia do zarządzania profilem, analizy statystyk wsparcia i komunikacji z darczyńcami. Wszystko, czego potrzebujesz w jednym miejscu.
                 </p>
               </div>
             </motion.div>
