@@ -45,9 +45,9 @@ const Home: React.FC = () => {
   const [currentSafariPhotoIndex, setCurrentSafariPhotoIndex] = useState(0)
 
   const photos = [
-    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//MAIN1.webp",
+    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//MAIN.png",
     "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//MAIN2.webp",
-    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//MAIN3.webp"
+    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//MAIN4.png"
   ]
 
   const safariPreviewPhotos = [
@@ -348,9 +348,9 @@ const Home: React.FC = () => {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6 }}
             >
-              <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1">
+              <div className="relative aspect-square rounded-2xl overflow-hidden order-1">
                 <img
-                  src="public/images/GRID1.webp"
+                  src="public/images/GRID1.svg"
                   alt="Profile System"
                   className="w-full h-full object-cover"
                 />
@@ -371,9 +371,9 @@ const Home: React.FC = () => {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6 }}
             >
-              <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1 md:order-2">
+              <div className="relative aspect-square rounded-2xl overflow-hidden order-1 md:order-2">
                 <img
-                  src="public/images/GRID2.webp"
+                  src="public/images/GRID2.svg"
                   alt="Payment System"
                   className="w-full h-full object-cover"
                 />
@@ -394,9 +394,9 @@ const Home: React.FC = () => {
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6 }}
             >
-              <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1">
+              <div className="relative aspect-square rounded-2xl overflow-hidden order-1">
                 <img
-                  src="public/images/GRID3.webp"
+                  src="public/images/GRID3.svg"
                   alt="Admin Panel"
                   className="w-full h-full object-cover"
                 />
