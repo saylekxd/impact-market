@@ -350,7 +350,7 @@ const Home: React.FC = () => {
             >
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1">
                 <img
-                  src="src/images/GRID1.webp"
+                  src="public/images/GRID1.webp"
                   alt="Profile System"
                   className="w-full h-full object-cover"
                 />
@@ -373,7 +373,7 @@ const Home: React.FC = () => {
             >
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1 md:order-2">
                 <img
-                  src="src/images/GRID2.webp"
+                  src="public/images/GRID2.webp"
                   alt="Payment System"
                   className="w-full h-full object-cover"
                 />
@@ -396,7 +396,7 @@ const Home: React.FC = () => {
             >
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-black/5 order-1">
                 <img
-                  src="src/images/GRID3.webp"
+                  src="public/images/GRID3.webp"
                   alt="Admin Panel"
                   className="w-full h-full object-cover"
                 />
