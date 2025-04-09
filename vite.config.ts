@@ -63,11 +63,23 @@ export default defineConfig({
         manualChunks: (id) => {
           // Vendor chunk for major dependencies
           if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
-              return 'vendor';
+            // Group React and all React-related packages together
+            if (id.includes('react') || 
+                id.includes('react-dom') || 
+                id.includes('react-router') || 
+                id.includes('@stripe/react-stripe-js') ||
+                id.includes('react-hot-toast') ||
+                id.includes('react-icons')) {
+              return 'react-vendor';
             }
-            if (id.includes('@radix-ui') || id.includes('@shadcn') || id.includes('lucide-react')) {
+            // UI libraries can be grouped separately
+            if (id.includes('@radix-ui') || id.includes('lucide-react')) {
               return 'ui';
+            }
+            // Handle known libraries that depend on React
+            if (id.includes('@supabase/auth-helpers-react') || 
+                id.includes('framer-motion')) {
+              return 'react-deps';
             }
             return 'deps'; // Other dependencies
           }
