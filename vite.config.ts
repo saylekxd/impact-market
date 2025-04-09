@@ -7,17 +7,6 @@ export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
     exclude: ['lucide-react'],
-    // Increase timeouts for file operations
-    esbuildOptions: {
-      keepNames: true,
-      target: 'esnext',
-      // Increase read/write timeouts
-      tsconfigRaw: {
-        compilerOptions: {
-          target: 'esnext',
-        },
-      },
-    },
   },
   server: {
     watch: {
