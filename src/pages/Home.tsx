@@ -350,7 +350,7 @@ const Home: React.FC = () => {
             >
               <div className="relative aspect-square rounded-2xl overflow-hidden order-1">
                 <img
-                  src="public/images/GRID1.svg"
+                  src="/images/GRID1.svg"
                   alt="Profile System"
                   className="w-full h-full object-cover"
                 />
@@ -373,7 +373,7 @@ const Home: React.FC = () => {
             >
               <div className="relative aspect-square rounded-2xl overflow-hidden order-1 md:order-2">
                 <img
-                  src="public/images/GRID2.svg"
+                  src="/images/GRID2.svg"
                   alt="Payment System"
                   className="w-full h-full object-cover"
                 />
@@ -396,7 +396,7 @@ const Home: React.FC = () => {
             >
               <div className="relative aspect-square rounded-2xl overflow-hidden order-1">
                 <img
-                  src="public/images/GRID3.svg"
+                  src="/images/GRID3.svg"
                   alt="Admin Panel"
                   className="w-full h-full object-cover"
                 />
