@@ -45,7 +45,7 @@ const Home: React.FC = () => {
   const [currentSafariPhotoIndex, setCurrentSafariPhotoIndex] = useState(0)
 
   const photos = [
-    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//MAIN.png",
+    "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//MAIN1.webp",
     "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//MAIN2.webp",
     "https://qmuemjlayfrescgmigcg.supabase.co/storage/v1/object/public/landing-photos//MAIN4.png"
   ]
