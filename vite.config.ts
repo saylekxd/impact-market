@@ -60,30 +60,6 @@ export default defineConfig({
     // Configure Rollup for better code splitting
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // Vendor chunk for major dependencies
-          if (id.includes('node_modules')) {
-            // Group React and all React-related packages together
-            if (id.includes('react') || 
-                id.includes('react-dom') || 
-                id.includes('react-router') || 
-                id.includes('@stripe/react-stripe-js') ||
-                id.includes('react-hot-toast') ||
-                id.includes('react-icons')) {
-              return 'react-vendor';
-            }
-            // UI libraries can be grouped separately
-            if (id.includes('@radix-ui') || id.includes('lucide-react')) {
-              return 'ui';
-            }
-            // Handle known libraries that depend on React
-            if (id.includes('@supabase/auth-helpers-react') || 
-                id.includes('framer-motion')) {
-              return 'react-deps';
-            }
-            return 'deps'; // Other dependencies
-          }
-        }
       }
     }
   },
