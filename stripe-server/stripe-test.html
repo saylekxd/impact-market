@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stripe Payment Test</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #4f46e5;
+        }
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #4338ca;
+        }
+        #card-element {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        #card-errors {
+            color: #dc2626;
+            margin-top: 8px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0fdf4;
+            border-radius: 4px;
+            border-left: 4px solid #10b981;
+        }
+        .error {
+            background-color: #fef2f2;
+            border-left: 4px solid #dc2626;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: #fff;
+            border-bottom: 1px solid white;
+            position: relative;
+            z-index: 1;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        a {
+            color: #4f46e5;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Stripe Payment Test</h1>
+    <p><a href="/">&larr; Back to Home</a></p>
+    
+    <div class="tabs">
+        <div class="tab active" data-tab="payment-intent">Payment Intent</div>
+        <div class="tab" data-tab="checkout">Checkout Session</div>
+    </div>
+    
+    <div id="payment-intent" class="tab-content active container">
+        <h2>Test Payment Intent</h2>
+        <form id="payment-form">
+            <div class="form-group">
+                <label for="amount">Amount (in cents)</label>
+                <input type="number" id="amount" value="1000" min="50" required>
+            </div>
+            <div class="form-group">
+                <label for="currency">Currency</label>
+                <select id="currency" required>
+                    <option value="usd">USD</option>
+                    <option value="eur">EUR</option>
+                    <option value="gbp">GBP</option>
+                    <option value="pln">PLN</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Card Details</label>
+                <div id="card-element"></div>
+                <div id="card-errors" role="alert"></div>
+            </div>
+            <button type="submit">Pay Now</button>
+        </form>
+        <div id="payment-result"></div>
+    </div>
+    
+    <div id="checkout" class="tab-content container">
+        <h2>Test Checkout Session</h2>
+        <form id="checkout-form">
+            <div class="form-group">
+                <label for="checkout-amount">Amount (in cents)</label>
+                <input type="number" id="checkout-amount" value="1000" min="50" required>
+            </div>
+            <div class="form-group">
+                <label for="checkout-currency">Currency</label>
+                <select id="checkout-currency" required>
+                    <option value="usd">USD</option>
+                    <option value="eur">EUR</option>
+                    <option value="gbp">GBP</option>
+                    <option value="pln">PLN</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="checkout-description">Description</label>
+                <input type="text" id="checkout-description" value="Test Donation" required>
+            </div>
+            <div class="form-group">
+                <label for="checkout-email">Email (optional)</label>
+                <input type="email" id="checkout-email" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label for="checkout-name">Name (optional)</label>
+                <input type="text" id="checkout-name" placeholder="John Doe">
+            </div>
+            <button type="submit">Create Checkout Session</button>
+        </form>
+        <div id="checkout-result"></div>
+    </div>
+    
+    <script>
+        // Initialize Stripe
+        const stripeKey = 'pk_test_51R069w4KyJAZ2CGw0VsLkQ9Q5rAbklXTrZIXDOxiFYySxuV7bnr7Ptc34c36QLzvZD8FxWpBfBALE1tbPZMUlbLZ00RdYSuXQj';
+        const stripe = Stripe(stripeKey);
+        const elements = stripe.elements();
+        const cardElement = elements.create('card');
+        cardElement.mount('#card-element');
+        
+        // Handle tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                document.getElementById(tab.getAttribute('data-tab')).classList.add('active');
+            });
+        });
+        
+        // Handle Payment Intent form submission
+        document.getElementById('payment-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const amount = document.getElementById('amount').value;
+            const currency = document.getElementById('currency').value;
+            const resultElement = document.getElementById('payment-result');
+            
+            // Show loading state
+            resultElement.innerHTML = '<p>Processing payment...</p>';
+            
+            try {
+                // Create a payment intent on the server
+                const paymentIntentResponse = await fetch('/api/create-payment-intent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount,
+                        currency
+                    })
+                });
+                
+                const paymentIntentData = await paymentIntentResponse.json();
+                
+                if (paymentIntentResponse.status !== 200) {
+                    throw new Error(paymentIntentData.error || 'Failed to create payment intent');
+                }
+                
+                // Confirm the payment with Stripe.js
+                const { error, paymentIntent } = await stripe.confirmCardPayment(paymentIntentData.clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: {
+                            name: 'Test User',
+                        },
+                    },
+                });
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                // Payment successful
+                resultElement.innerHTML = `
+                    <div class="result">
+                        <h3>Payment Successful!</h3>
+                        <p>Payment ID: ${paymentIntent.id}</p>
+                        <p>Amount: ${(paymentIntent.amount / 100).toFixed(2)} ${paymentIntent.currency.toUpperCase()}</p>
+                        <p>Status: ${paymentIntent.status}</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultElement.innerHTML = `
+                    <div class="result error">
+                        <h3>Payment Failed</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+        
+        // Handle Checkout Session form submission
+        document.getElementById('checkout-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const amount = document.getElementById('checkout-amount').value;
+            const currency = document.getElementById('checkout-currency').value;
+            const description = document.getElementById('checkout-description').value;
+            const email = document.getElementById('checkout-email').value;
+            const name = document.getElementById('checkout-name').value;
+            const resultElement = document.getElementById('checkout-result');
+            
+            // Generate a random payment ID for testing
+            const paymentId = 'test_' + Math.random().toString(36).substring(2, 15);
+            
+            // Show loading state
+            resultElement.innerHTML = '<p>Creating checkout session...</p>';
+            
+            try {
+                // Create a checkout session on the server
+                const sessionResponse = await fetch('/api/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        paymentId,
+                        amount,
+                        currency,
+                        description,
+                        email,
+                        name
+                    })
+                });
+                
+                const sessionData = await sessionResponse.json();
+                
+                if (sessionResponse.status !== 200) {
+                    throw new Error(sessionData.error || 'Failed to create checkout session');
+                }
+                
+                // Redirect to Stripe checkout page
+                resultElement.innerHTML = `
+                    <div class="result">
+                        <h3>Checkout Session Created</h3>
+                        <p>Session ID: ${sessionData.id}</p>
+                        <p><a href="${sessionData.url}" target="_blank">Click here to open checkout</a></p>
+                    </div>
+                `;
+                
+                // Optionally automatically redirect
+                // window.location.href = sessionData.url;
+                
+            } catch (error) {
+                resultElement.innerHTML = `
+                    <div class="result error">
+                        <h3>Checkout Session Creation Failed</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html> 

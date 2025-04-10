@@ -1,5 +1,5 @@
 // API configuration
-export const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://impactmarket-backend.onrender.com';
 
 // Default API configuration
 export const DEFAULT_API_CONFIG = {

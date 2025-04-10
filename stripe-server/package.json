@@ -1,0 +1,20 @@
+{
+  "name": "stripe-server",
+  "version": "1.0.0",
+  "description": "Node.js server for handling Stripe payments",
+  "main": "server-api.cjs",
+  "scripts": {
+    "start": "node server-api.cjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "stripe": "^12.0.0",
+    "@supabase/supabase-js": "^2.21.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+} 

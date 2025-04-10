@@ -24,9 +24,9 @@ export default defineConfig({
     // Add proxy configuration for API endpoints
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'https://impactmarket-backend.onrender.com',
         changeOrigin: true,
-        secure: false,
+        secure: true,
         rewrite: (path) => path
       },
     },
